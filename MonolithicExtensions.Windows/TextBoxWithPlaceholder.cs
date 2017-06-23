@@ -12,7 +12,7 @@ namespace MonolithicExtensions.Windows
         /// The control which holds the placeholder text
         /// </summary>
         /// <returns></returns>
-        private Label PlaceholderControl { get; set; }
+        private Label PlaceholderControl { get; set; } = new Label();
 
         public TextBoxWithPlaceholder()
         {
