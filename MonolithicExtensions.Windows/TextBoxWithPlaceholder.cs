@@ -35,7 +35,7 @@ namespace MonolithicExtensions.Windows
         /// Set or get the placeholder text for this textbox
         /// </summary>
         /// <returns></returns>
-        public string Placeholder
+        public virtual string Placeholder
         {
             get { return PlaceholderControl.Text; }
             set { PlaceholderControl.Text = value; }
