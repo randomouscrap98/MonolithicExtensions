@@ -73,6 +73,14 @@ namespace MonolithicExtensions.UnitTest
             //regularObject.Equals(SimpleClass))
         }
 
+        [TestMethod()]
+        public void JsonTransporterTest()
+        {
+            var transporter = JsonTransporter.Create<ComplexContainer>(SimpleClass);
+            Assert.IsFalse(SimpleClass.Equals(new ComplexContainer()));
+            Assert.IsTrue(transporter.GetObject().Equals(SimpleClass));
+        }
+
     }
 
     //=======================================================

@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Libraries\log4net-1.2.15\bin\net\4.5\release\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -50,15 +54,20 @@
     <Compile Include="FilePathSelectorControl.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="FontExtensions.cs" />
     <Compile Include="FormExtensions.cs" />
+    <Compile Include="GACUtilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegistryExtensions.cs" />
     <Compile Include="RestartManager.cs" />
+    <Compile Include="TextBoxAppender.cs" />
     <Compile Include="TextBoxWithPlaceholder.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="UnitTestBase.cs" />
     <Compile Include="UnitTestSpecialInterface.cs" />
     <Compile Include="WindowsAccountServices.cs" />
+    <Compile Include="WindowsHooksExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonolithicExtensions.General\MonolithicExtensions.General.csproj">

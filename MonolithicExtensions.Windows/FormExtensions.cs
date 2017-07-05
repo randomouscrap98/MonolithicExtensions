@@ -284,8 +284,45 @@ namespace MonolithicExtensions.Windows
                     SomeControl.BackColor = Color.White;
                 }
             }
-
         }
+
+        public static void FillWithList<T>(this ListView view, IEnumerable<T> items, Func<T, string> displayFunction = null)
+        {
+            if (displayFunction == null)
+                displayFunction = x => x.ToString();
+
+            view.Clear();
+            view.View = View.Details;
+            view.Scrollable = true;
+            view.HeaderStyle = ColumnHeaderStyle.None;
+            view.FullRowSelect = true;
+
+            var header = new ColumnHeader();
+            header.Text = "";
+            header.Name = "column" + DateTime.Now.Ticks;
+            view.Columns.Add(header);
+
+            foreach (T item in items)
+            {
+                var viewItem = new ListViewItem(displayFunction(item));
+                viewItem.Tag = item;
+                view.Items.Add(viewItem);
+            }
+
+            view.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+        }
+
+        //public static void FillWithList<T>(this ComboBox box, IEnumerable<T> items, Func<T, string> displayFunction = null)
+        //{
+        //    if (displayFunction == null)
+        //        displayFunction = x => x.ToString();
+
+        //    box.Items.Clear();
+        //    foreach(T item in items)
+        //    {
+        //        var comboboxItem = new item
+        //    }
+        //}
 
         public static void SafeAppend(this TextBox textbox, string message)
         {

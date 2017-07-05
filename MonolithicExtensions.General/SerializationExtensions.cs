@@ -249,7 +249,7 @@ namespace MonolithicExtensions.General
     {
         //If having a string causes issues, change to byte array.
         [System.Runtime.Serialization.DataMember()]
-        private string data { get; set; }
+        private string data = "";
 
         public JsonTransporter()
         {
