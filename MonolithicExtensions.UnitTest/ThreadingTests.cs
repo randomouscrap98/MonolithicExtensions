@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MonolithicExtensions.Windows;
 using MonolithicExtensions.General;
+using MonolithicExtensions.Portable;
 
 namespace MonolithicExtensions.UnitTest
 {

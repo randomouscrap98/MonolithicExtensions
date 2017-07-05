@@ -126,104 +126,104 @@ namespace MonolithicExtensions.General
         }
     }
 
-    /// <summary>
-    /// Allows jobs to be run one at a time, no matter when the job was submitted. Waits for
-    /// jobs to be scheduled using async callbacks.
-    /// </summary>
-    public class AsyncJobQueue
-    {
+    ///// <summary>
+    ///// Allows jobs to be run one at a time, no matter when the job was submitted. Waits for
+    ///// jobs to be scheduled using async callbacks.
+    ///// </summary>
+    //public class AsyncJobQueue
+    //{
 
-        private readonly object QueueLock = new object();
+    //    private readonly object QueueLock = new object();
 
-        private Queue<Tuple<Action, AutoResetEvent>> JobQueue = new Queue<Tuple<Action, AutoResetEvent>>();
-        //Private NextSignaler As New AutoResetEvent(True)
+    //    private Queue<Tuple<Action, AutoResetEvent>> JobQueue = new Queue<Tuple<Action, AutoResetEvent>>();
+    //    //Private NextSignaler As New AutoResetEvent(True)
 
-        //Private Async Function WaitForToken() As Task(Of AutoResetEvent)
+    //    //Private Async Function WaitForToken() As Task(Of AutoResetEvent)
 
-        //    Dim waitSignaler As AutoResetEvent
+    //    //    Dim waitSignaler As AutoResetEvent
 
-        //    'Retrieve the signaler WE should be using to wait on, then swap out the next signaler with
-        //    'our own (so the next job waits on us)
-        //    SyncLock SignalLock
-        //        mySignaler = New AutoResetEvent(False)
-        //        waitSignaler = NextSignaler
-        //        NextSignaler = mySignaler
-        //    End SyncLock
+    //    //    'Retrieve the signaler WE should be using to wait on, then swap out the next signaler with
+    //    //    'our own (so the next job waits on us)
+    //    //    SyncLock SignalLock
+    //    //        mySignaler = New AutoResetEvent(False)
+    //    //        waitSignaler = NextSignaler
+    //    //        NextSignaler = mySignaler
+    //    //    End SyncLock
 
-        //    'Now we can safely wait for our signal.
-        //    Return mySignaler
+    //    //    'Now we can safely wait for our signal.
+    //    //    Return mySignaler
 
-        //End Function
+    //    //End Function
 
-        public async Task ExecuteWhenReady(Action job)
-        {
-            AutoResetEvent myEvent = new AutoResetEvent(false);
-            AutoResetEvent currentJobEvent = default(AutoResetEvent);
+    //    public async Task ExecuteWhenReady(Action job)
+    //    {
+    //        AutoResetEvent myEvent = new AutoResetEvent(false);
+    //        AutoResetEvent currentJobEvent = default(AutoResetEvent);
 
-            //Grab the next signaler and add us as the last job
-            lock (QueueLock)
-            {
-                if (JobQueue.Count == 0)
-                {
-                    currentJobEvent = new AutoResetEvent(true);
-                }
-                else
-                {
-                    currentJobEvent = JobQueue.Last().Item2;
-                }
-                JobQueue.Enqueue(Tuple.Create(job, myEvent));
-            }
+    //        //Grab the next signaler and add us as the last job
+    //        lock (QueueLock)
+    //        {
+    //            if (JobQueue.Count == 0)
+    //            {
+    //                currentJobEvent = new AutoResetEvent(true);
+    //            }
+    //            else
+    //            {
+    //                currentJobEvent = JobQueue.Last().Item2;
+    //            }
+    //            JobQueue.Enqueue(Tuple.Create(job, myEvent));
+    //        }
 
-            //Wait for our turn
-            await Task.Run(() => currentJobEvent.WaitOne());
+    //        //Wait for our turn
+    //        await Task.Run(() => currentJobEvent.WaitOne());
 
-            try
-            {
-                //Run our crap
-                job.Invoke();
-            }
-            finally
-            {
-                //Remove ourselves from the queue FIRST, that way if we're the only thing in the queue and a new 
-                //job gets added, it will either attach to our event which HASN'T been set yet, or it'll see 
-                //nothing in the queue and not have any wait.
-                lock (QueueLock)
-                {
-                    dynamic dequeuedJob = JobQueue.Dequeue();
-                    if (!object.ReferenceEquals(dequeuedJob.Item1, job))
-                    {
-                        throw new InvalidOperationException("The queue had a programming failure; the dequeued job is not the same as the one that just completed!");
-                    }
-                }
+    //        try
+    //        {
+    //            //Run our crap
+    //            job.Invoke();
+    //        }
+    //        finally
+    //        {
+    //            //Remove ourselves from the queue FIRST, that way if we're the only thing in the queue and a new 
+    //            //job gets added, it will either attach to our event which HASN'T been set yet, or it'll see 
+    //            //nothing in the queue and not have any wait.
+    //            lock (QueueLock)
+    //            {
+    //                dynamic dequeuedJob = JobQueue.Dequeue();
+    //                if (!object.ReferenceEquals(dequeuedJob.Item1, job))
+    //                {
+    //                    throw new InvalidOperationException("The queue had a programming failure; the dequeued job is not the same as the one that just completed!");
+    //                }
+    //            }
 
-                //Tell the next person in line to go.
-                myEvent.Set();
-            }
-        }
+    //            //Tell the next person in line to go.
+    //            myEvent.Set();
+    //        }
+    //    }
 
-        /// <summary>
-        /// Completely removes all jobs from the job queue, including the one running (it'll still finish though)
-        /// </summary>
-        public void ClearJobs()
-        {
-            lock (QueueLock)
-            {
-                JobQueue.Clear();
-            }
-        }
+    //    /// <summary>
+    //    /// Completely removes all jobs from the job queue, including the one running (it'll still finish though)
+    //    /// </summary>
+    //    public void ClearJobs()
+    //    {
+    //        lock (QueueLock)
+    //        {
+    //            JobQueue.Clear();
+    //        }
+    //    }
 
-        public List<Action> CurrentJobs
-        {
-            get
-            {
-                lock (QueueLock)
-                {
-                    return JobQueue.Select(x => x.Item1).ToList();
-                }
-            }
-        }
+    //    public List<Action> CurrentJobs
+    //    {
+    //        get
+    //        {
+    //            lock (QueueLock)
+    //            {
+    //                return JobQueue.Select(x => x.Item1).ToList();
+    //            }
+    //        }
+    //    }
 
-    }
+    //}
 
     //=======================================================
     //Service provided by Telerik (www.telerik.com)
