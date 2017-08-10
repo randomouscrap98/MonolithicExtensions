@@ -14,11 +14,30 @@ namespace MonolithicExtensions.Portable
     public class AsyncJobQueue
     {
         private readonly object QueueLock = new object();
+        protected readonly Logging.ILogger Logger;
 
         private Queue<Tuple<Action, AutoResetEvent>> JobQueue = new Queue<Tuple<Action, AutoResetEvent>>();
 
+        public AsyncJobQueue()
+        {
+            Logger = Logging.LogServices.CreateLoggerFromDefault(this.GetType());
+        }
+
         public async Task ExecuteWhenReady(Action job)
         {
+            await ExecuteWhenReady_Generic(job, false);
+        }
+
+        public void ExecuteWhenReadyBlocking(Action job)
+        {
+            ExecuteWhenReady_Generic(job, true).Wait();
+        }
+
+        protected async Task ExecuteWhenReady_Generic(Action job, bool block = false)
+        {
+            var jobID = Guid.NewGuid();
+            Logger.Trace($"Running job on async queue (blocking: {block}). ID: {jobID}");
+
             AutoResetEvent myEvent = new AutoResetEvent(false);
             AutoResetEvent currentJobEvent = default(AutoResetEvent);
 
@@ -27,22 +46,31 @@ namespace MonolithicExtensions.Portable
             {
                 if (JobQueue.Count == 0)
                 {
+                    Logger.Trace($"0 jobs in queue, so using a new reset event. It should instantly start");
                     currentJobEvent = new AutoResetEvent(true);
                 }
                 else
                 {
+                    Logger.Trace($"{JobQueue.Count} jobs in queue, so using an existing reset event. It should start when all other jobs are finished.");
                     currentJobEvent = JobQueue.Last().Item2;
                 }
                 JobQueue.Enqueue(Tuple.Create(job, myEvent));
             }
 
             //Wait for our turn
-            await Task.Run(() => currentJobEvent.WaitOne());
+            Logger.Debug($"Waiting for turn for job {jobID}");
+
+            if (block)
+                currentJobEvent.WaitOne();
+            else
+                await Task.Run(() => currentJobEvent.WaitOne());
 
             try
             {
                 //Run our crap
+                Logger.Debug($"Beginning enqueued job: {jobID}");
                 job.Invoke();
+                Logger.Debug($"Completed job: {jobID}");
             }
             finally
             {
@@ -51,7 +79,7 @@ namespace MonolithicExtensions.Portable
                 //nothing in the queue and not have any wait.
                 lock (QueueLock)
                 {
-                    dynamic dequeuedJob = JobQueue.Dequeue();
+                    var dequeuedJob = JobQueue.Dequeue();
                     if (!object.ReferenceEquals(dequeuedJob.Item1, job))
                     {
                         throw new InvalidOperationException("The queue had a programming failure; the dequeued job is not the same as the one that just completed!");
@@ -68,6 +96,7 @@ namespace MonolithicExtensions.Portable
         /// </summary>
         public void ClearJobs()
         {
+            Logger.Trace("Clearing all jobs");
             lock (QueueLock)
             {
                 JobQueue.Clear();

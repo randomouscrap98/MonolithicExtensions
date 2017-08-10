@@ -29,12 +29,13 @@ namespace MonolithicExtensions.General.Logging
         public string Name
         {
             get { return Logger.Logger.Name; }
-            set { /* Unfortunately, you cannot set the name for a Log4Net Logger */ }
+            set { Logger = log4net.LogManager.GetLogger(value); }
         }
 
         public void Initialize(string name)
         {
-            Logger = log4net.LogManager.GetLogger(name);
+            Name = name;
+            //Logger = log4net.LogManager.GetLogger(name);
         }
 
         public log4net.Core.Level ConvertToLog4NetLevel(int level)

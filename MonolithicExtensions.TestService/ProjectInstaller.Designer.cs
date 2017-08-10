@@ -42,7 +42,6 @@
             this.serviceInstaller1.Description = "A service which is used for unit testing in MonolithicExtensions";
             this.serviceInstaller1.DisplayName = "MonolithicExtensions.TestService";
             this.serviceInstaller1.ServiceName = "MonolithicExtensions.TestService";
-            this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             this.serviceInstaller1.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.serviceInstaller1_AfterInstall);
             // 
             // ProjectInstaller

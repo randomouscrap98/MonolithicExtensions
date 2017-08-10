@@ -64,6 +64,7 @@
     <Compile Include="RegistryTests.cs" />
     <Compile Include="RestartManagerTests.cs" />
     <Compile Include="SerializationTest.cs" />
+    <Compile Include="StreamTests.cs" />
     <Compile Include="ThreadingTests.cs" />
     <Compile Include="WindowsAccountsTest.cs" />
   </ItemGroup>

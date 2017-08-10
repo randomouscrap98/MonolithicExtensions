@@ -100,6 +100,17 @@ namespace MonolithicExtensions.Portable
             SetSetting<Type>(typeof(T), value);
         }
 
+        public object Create(Type objectType)
+        {
+            if(Logger != null)
+                Logger.Trace("Attempting to create object of type " + objectType.Name);
+            if (!CreationMapping.ContainsKey(objectType))
+            {
+                throw new InvalidOperationException("There is no method to create this type!");
+            }
+            return CreationMapping[objectType].Invoke(this);
+        }
+
         /// <summary>
         /// Attempt to create an interface/service/whatever of the given type
         /// </summary>
@@ -107,14 +118,7 @@ namespace MonolithicExtensions.Portable
         /// <returns></returns>
         public T Create<T>()
         {
-            Type type = typeof(T);
-            if(Logger != null)
-                Logger.Trace("Attempting to create object of type " + type.Name);
-            if (!CreationMapping.ContainsKey(type))
-            {
-                throw new InvalidOperationException("There is no method to create this type!");
-            }
-            return (T)CreationMapping[type].Invoke(this);
+            return (T)Create(typeof(T));
         }
 
         /// <summary>

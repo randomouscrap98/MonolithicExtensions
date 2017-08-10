@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonolithicExtensions.Genera
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonolithicExtensions.TestService", "MonolithicExtensions.TestService\MonolithicExtensions.TestService.csproj", "{716DA0F3-3DB9-4B10-84B4-971EBE2CDC82}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonolithicExtensions.Android", "MonolithicExtensions.Android\MonolithicExtensions.Android.csproj", "{3CB4A691-A91E-4954-A9AE-E77185FC371E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{716DA0F3-3DB9-4B10-84B4-971EBE2CDC82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{716DA0F3-3DB9-4B10-84B4-971EBE2CDC82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{716DA0F3-3DB9-4B10-84B4-971EBE2CDC82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CB4A691-A91E-4954-A9AE-E77185FC371E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CB4A691-A91E-4954-A9AE-E77185FC371E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CB4A691-A91E-4954-A9AE-E77185FC371E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CB4A691-A91E-4954-A9AE-E77185FC371E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -71,13 +71,26 @@ namespace MonolithicExtensions.Portable.Logging
             this.Name = name;
         }
 
-        public void Debug(string message) { LogServices.DefaultLogger.Debug(message); }
-        public void Error(string message) { LogServices.DefaultLogger.Error(message); }
-        public void Fatal(string message) { LogServices.DefaultLogger.Fatal(message); }
-        public void Info(string message) { LogServices.DefaultLogger.Info(message); }
-        public void Trace(string message) { LogServices.DefaultLogger.Trace(message); }
-        public void Warn(string message) { LogServices.DefaultLogger.Warn(message); }
-        public void LogRaw(string message, int level) { LogServices.DefaultLogger.LogRaw(message, level); }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>This could be VERY performance heavy. Use with caution.</remarks>
+        /// <param name="task"></param>
+        private void RunWithName(Action task)
+        {
+            var defaultName = LogServices.DefaultLogger.Name;
+            LogServices.DefaultLogger.Name = Name;
+            task.Invoke();
+            LogServices.DefaultLogger.Name = defaultName;
+        }
+
+        public void Debug(string message) { RunWithName(() => LogServices.DefaultLogger.Debug(message)); }
+        public void Error(string message) { RunWithName(() => LogServices.DefaultLogger.Error(message)); }
+        public void Fatal(string message) { RunWithName(() => LogServices.DefaultLogger.Fatal(message)); }
+        public void Info(string message) { RunWithName(() => LogServices.DefaultLogger.Info(message)); }
+        public void Trace(string message) { RunWithName(() => LogServices.DefaultLogger.Trace(message)); }
+        public void Warn(string message) { RunWithName(() => LogServices.DefaultLogger.Warn(message)); }
+        public void LogRaw(string message, int level) { RunWithName(() => LogServices.DefaultLogger.LogRaw(message, level)); }
     }
 
     /// <summary>
