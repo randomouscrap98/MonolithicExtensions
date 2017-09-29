@@ -161,7 +161,7 @@ namespace MonolithicExtensions.Portable.Logging
         /// <returns></returns>
         public static ILogger CreateLoggerFromDefault(Type objectType)
         {
-            return CreateLoggerFromDefault(objectType.FullName);
+            return CreateLoggerFromDefault(objectType.Namespace + "." + objectType.Name);
         }
     }
 }

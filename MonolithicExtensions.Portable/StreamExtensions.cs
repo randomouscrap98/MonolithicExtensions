@@ -33,6 +33,8 @@ namespace MonolithicExtensions.Portable
         /// <returns></returns>
         public static byte ReadByteWithTimeout(this Stream dataStream, TimeSpan timeout, byte[] reusableBuffer)
         {
+            if (!dataStream.CanTimeout)
+                return dataStream.ReadByteWithTimeoutManual(timeout);
             if (timeout.TotalMilliseconds <= 0)
                 throw new TimeoutException("ReadByteWithTimeout timed out immediately due to a non-positive timeout!");
 
