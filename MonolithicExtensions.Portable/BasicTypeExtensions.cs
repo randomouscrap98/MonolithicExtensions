@@ -2,6 +2,8 @@
 using System.Text.RegularExpressions;
 //using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Text;
+using System.Collections.Generic;
 
 namespace MonolithicExtensions.Portable
 {
@@ -140,6 +142,45 @@ namespace MonolithicExtensions.Portable
             if (sl == "t" || sl == "y" || sl == "yes") return true;
             if (sl == "f" || sl == "n" || sl == "no") return false;
             throw new InvalidOperationException("Could Not cast string to boolean");
+        }
+
+        public static string AutoWordWrap(this string s, int width, string lineSeparator = "\r\n", 
+              string wordSeparator = " ")
+        {
+            s += wordSeparator + lineSeparator;
+            StringBuilder final = new StringBuilder();
+            int lineLength = 0;
+            int maxSeparator = Math.Max(wordSeparator.Length, lineSeparator.Length);
+
+            for(int i = 0; i < s.Length; i++)
+            {
+               //If the current character is the line separator, handle it now
+               //rather than letting the wrapper accidentally break it up.
+               if(s.IndexOf(lineSeparator, i) - i == 0)
+               {
+                  lineLength = 0;
+                  final.Append(lineSeparator);
+                  i += (lineSeparator.Length - 1);
+                  continue;
+               }
+
+               //If the line is already way too long OR we're currently on a
+               //space AND the next space is too far away, then wrap.
+               if(lineLength >= width || s.IndexOf(wordSeparator, i) == i &&
+                  Math.Min(s.IndexOf(wordSeparator, i + 1), s.IndexOf(lineSeparator, i + 1)) - i - 1 +
+                  lineLength + maxSeparator >= width)
+               {
+                  lineLength = 0;
+                  final.Append(lineSeparator);
+                  continue;
+               }
+
+               final.Append(s[i]);
+               lineLength++;
+            }
+
+            final.Remove(final.Length - maxSeparator, maxSeparator);
+            return final.ToString();
         }
     }
 
