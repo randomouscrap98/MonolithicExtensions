@@ -38,6 +38,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Android" />
     <Reference Include="mscorlib" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\Libraries\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,6 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AndroidLogExtensions.cs" />
+    <Compile Include="PendingDialog.cs" />
+    <Compile Include="PreferenceExtensions.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleActivity.cs" />

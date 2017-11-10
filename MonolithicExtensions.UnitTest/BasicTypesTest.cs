@@ -62,6 +62,18 @@ namespace MonolithicExtensions.UnitTest
             }
         }
 
+        [TestMethod]
+        public void TestBytesToGuid()
+        {
+            LogStart("TestBytesToGuid");
+
+            Guid result = (new byte[]{255,255}).ToGuid();
+            Assert.IsTrue(result == new Guid(new byte[16]{ 255,255,0,0,0,0,0,0,0,0,0,0,0,0,0,0}));
+            result = (new byte[]{0,55,67,89}).ToGuid();
+            Assert.IsTrue(result == new Guid(new byte[16]{ 0,55,67,89,0,0,0,0,0,0,0,0,0,0,0,0}));
+            result = (new byte[20] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }).ToGuid();
+            Assert.IsTrue(result == new Guid(new byte[16] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}));
+        }
 
         [TestMethod]
         public void TestHumanReadableBytes()

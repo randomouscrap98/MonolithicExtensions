@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MonolithicExtensions.Portable
 {
@@ -111,6 +112,18 @@ namespace MonolithicExtensions.Portable
             return result;
         }
 
+        /// <summary>
+        /// Return a guid representing the given bytes. If there are too many bytes, only the lower bytes are
+        /// used. If there are not enough bytes, 0's are inserted.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static Guid ToGuid(this byte[] data)
+        {
+            byte[] guidBytes = new byte[16];
+            Array.Copy(data, guidBytes, Math.Min(16, data.Length));
+            return new Guid(guidBytes);
+        }
     }
 
     public static class StringExtensions

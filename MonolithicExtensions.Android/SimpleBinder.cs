@@ -34,17 +34,34 @@ namespace MonolithicExtensions.Android
     {
         protected SimpleBinder bindRedirector;
         protected ILogger Logger;
+        protected Handler uiHandler;
 
         public SimpleService()
         {
             bindRedirector = new SimpleBinder() { BoundService = this };
             Logger = LogServices.CreateLoggerFromDefault(this.GetType());
+            uiHandler = new Handler();
         }
 
         public override IBinder OnBind(Intent intent)
         {
             Logger.Debug($"SimpleService of type {this.GetType()} bound!");
             return bindRedirector;
+        }
+
+        public void RunOnUiThread(Action action)
+        {
+            uiHandler.Post(action);
+        }
+
+        public void DoToast(string message, ToastLength length = ToastLength.Short)
+        {
+            RunOnUiThread(() => Toast.MakeText(this, message, length).Show());
+        }
+
+        public void DoToast(int messageResource, ToastLength length = ToastLength.Short)
+        {
+            RunOnUiThread(() => Toast.MakeText(this, messageResource, length).Show());
         }
     }
 
@@ -161,14 +178,14 @@ namespace MonolithicExtensions.Android
         {
             Logger.Trace($"Android OnServiceConnected for {service.GetType()}");
 
+            try { _Service = ServiceCastFunction(service); }
+            catch(Exception E) { Logger.Error($"Couldn't cast service: {E}"); }
             _Connected = true;
+
             Action<T> handler = ServiceConnected;
 
             if (handler != null)
             {
-                try { _Service = ServiceCastFunction(service); }
-                catch(Exception E) { Logger.Error($"Couldn't cast service: {E}"); }
-
                 handler(_Service);
             }
             else
