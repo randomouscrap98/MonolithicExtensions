@@ -16,23 +16,53 @@ namespace MonolithicExtensions.Android
 {
     public class PendingDialog
     {
-        public int ID = 0;
-        public string Title = "";
-        public string Message = "";
-        public string PositiveText = "";
-        public string NegativeText = "";
-        public bool Cancellable = true;
+        public int ID;
+        public string Title;
+        public string Message;
+        public string PositiveText;
+        public string NegativeText;
+        public bool Cancellable;
 
-        private int waiting = 0;
-        private int pending = 0;
+        public Action<Context> PositiveAction;
+        public Action<Context> NegativeAction;
+
+        private int waiting;
+        private int pending;
         private AutoResetEvent signal = new AutoResetEvent(false);
-        private PendingDialogResult result = PendingDialogResult.None;
+        private PendingDialogResult result;
 
         protected ILogger Logger;
 
         public PendingDialog()
         {
             Logger = LogServices.CreateLoggerFromDefault(this.GetType());
+            Reset();
+        }
+        
+        public void Reset()
+        {
+            waiting = 0;
+            pending = 0;
+            result = PendingDialogResult.None;
+            signal.Set(); //Cancel any pending stuff
+
+            ID = 0;
+            Title = "";
+            Message = "";
+            PositiveText = "";
+            NegativeText = "";
+            PositiveAction = null;
+            NegativeAction = null;
+            Cancellable = true;
+        }
+
+        public void QuickSetup(string title, string message, string positiveText, string negativeText, bool? cancellable = null)
+        {
+            this.Title = title;
+            this.Message = message;
+            this.PositiveText = positiveText;
+            this.NegativeText = negativeText;
+            if (cancellable != null) this.Cancellable = (bool)cancellable;
         }
 
         //Only one thing can wait for the dialog result. Erm will that be a problem? 
@@ -71,7 +101,7 @@ namespace MonolithicExtensions.Android
             get { return pending != 0; }
         }
 
-        public void ShowDialog(Context context, Action positiveAction = null, Action negativeAction = null)
+        public void ShowDialog(Context context)//, Action positiveAction = null, Action negativeAction = null)
         {
             Logger.Trace("ShowDialog called");
             Interlocked.Exchange(ref pending, 0);
@@ -80,13 +110,13 @@ namespace MonolithicExtensions.Android
             builder.SetPositiveButton(PositiveText, (d, i) =>
             {
                 result = PendingDialogResult.Positive;
-                if (positiveAction != null) positiveAction.Invoke();
+                if (PositiveAction != null) PositiveAction.Invoke(context);
                 signal.Set();
             });
             builder.SetNegativeButton(NegativeText, (d, i) =>
             {
                 result = PendingDialogResult.Negative;
-                if (negativeAction != null) negativeAction.Invoke();
+                if (NegativeAction != null) NegativeAction.Invoke(context);
                 signal.Set();
             });
             builder.SetCancelable(Cancellable);

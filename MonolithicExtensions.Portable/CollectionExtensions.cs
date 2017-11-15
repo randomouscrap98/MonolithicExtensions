@@ -49,6 +49,35 @@ namespace MonolithicExtensions.Portable
         }
 
         /// <summary>
+        /// Merge given dictionary with self in-place. Only new entries are copied over; set replaceExisting to true 
+        /// if you want to replace entries.
+        /// </summary>
+        /// <typeparam name="K"></typeparam>
+        /// <typeparam name="Y"></typeparam>
+        /// <param name="existing"></param>
+        /// <param name="newStuff"></param>
+        /// <param name="replaceExisting"></param>
+        /// <returns>The amount of altered elements</returns>
+        public static int MergeWithSelf<K, Y>(this Dictionary<K, Y> existing, Dictionary<K, Y> newStuff, bool replaceExisting = false)
+        {
+            int altered = 0;
+            foreach(K key in newStuff.Keys)
+            {
+                if (!existing.ContainsKey(key))
+                {
+                    existing.Add(key, newStuff[key]);
+                    altered++;
+                }
+                else if (replaceExisting)
+                {
+                    existing[key] = newStuff[key];
+                    altered++;
+                }
+            }
+            return altered;
+        }
+
+        /// <summary>
         /// Performs an in-place "Knuth" shuffle on the given list (Knuth didn't really invent it)
         /// </summary>
         /// <typeparam name="T"></typeparam>

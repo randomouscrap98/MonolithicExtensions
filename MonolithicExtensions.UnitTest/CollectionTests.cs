@@ -58,6 +58,29 @@ namespace MonolithicExtensions.UnitTest
         }
 
         [TestMethod()]
+        public void TestMerge_Dictionary()
+        {
+            Dictionary<int, string> myDict = new Dictionary<int, string>(SimpleDictionary);
+            Dictionary<int, string> mySilliness = new Dictionary<int, string>() { { 2, "don't break my two" } };
+
+            Assert.IsTrue(myDict.MergeWithSelf(mySilliness) == 0);
+            Assert.IsTrue(myDict.IsEquivalentTo(SimpleDictionary));
+
+            Assert.IsTrue(myDict.MergeWithSelf(mySilliness, true) == 1);
+            Assert.IsFalse(myDict.IsEquivalentTo(SimpleDictionary));
+            Assert.IsTrue(myDict.Count == SimpleDictionary.Count);
+            Assert.IsTrue(myDict[2] == mySilliness[2]);
+
+            mySilliness.Add(99999999, "wow really big");
+            mySilliness.Add(99999998, "wow almost really big");
+            Assert.IsTrue(myDict.MergeWithSelf(mySilliness) == 2);
+            Assert.IsFalse(myDict.IsEquivalentTo(SimpleDictionary));
+            Assert.IsTrue(myDict.Count > SimpleDictionary.Count);
+            Assert.IsTrue(myDict[99999999] == mySilliness[99999999]);
+            Assert.IsTrue(myDict[99999998] == mySilliness[99999998]);
+        }
+
+        [TestMethod()]
         public void TestShuffle()
         {
             //Create an array of a hundred integers. Create a copy of it too.
