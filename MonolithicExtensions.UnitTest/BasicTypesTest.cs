@@ -42,6 +42,25 @@ namespace MonolithicExtensions.UnitTest
             Assert.IsFalse("n".ToBoolean());
         }
 
+        private enum Conspiracy
+        {
+            FlatEarth,
+            MoonLanding,
+            NorthPoleHole
+        }
+
+        [TestMethod]
+        public void TestConvertToEnum()
+        {
+            LogStart("TestConvertToEnum");
+
+            Assert.IsTrue("FlatEarth".ConvertToEnum<Conspiracy>() == Conspiracy.FlatEarth);
+            Assert.IsTrue("MoonLanding".ConvertToEnum<Conspiracy>() == Conspiracy.MoonLanding);
+            Assert.IsTrue("NorthPoleHole".ConvertToEnum<Conspiracy>() == Conspiracy.NorthPoleHole);
+
+            MyAssert.ThrowsException(() => "What".ConvertToEnum<Conspiracy>());
+        }
+
         [TestMethod]
         public void TestIntToGuid()
         {

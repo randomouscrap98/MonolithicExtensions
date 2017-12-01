@@ -217,6 +217,17 @@ namespace MonolithicExtensions.Portable
             final.Remove(final.Length - maxSeparator, maxSeparator);
             return final.ToString();
         }
+
+        /// <summary>
+        /// Convert string to enum of type T. 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumValue"></param>
+        /// <returns></returns>
+        public static T ConvertToEnum<T>(this string enumValue)
+        {
+            return (T)Enum.Parse(typeof(T), enumValue);
+        }
     }
 
     public static class HumanReadableExtensions

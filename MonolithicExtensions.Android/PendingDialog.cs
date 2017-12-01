@@ -113,12 +113,15 @@ namespace MonolithicExtensions.Android
                 if (PositiveAction != null) PositiveAction.Invoke(context);
                 signal.Set();
             });
-            builder.SetNegativeButton(NegativeText, (d, i) =>
+            if (!String.IsNullOrWhiteSpace(NegativeText) || NegativeAction != null)
             {
-                result = PendingDialogResult.Negative;
-                if (NegativeAction != null) NegativeAction.Invoke(context);
-                signal.Set();
-            });
+                builder.SetNegativeButton(NegativeText, (d, i) =>
+                {
+                    result = PendingDialogResult.Negative;
+                    if (NegativeAction != null) NegativeAction.Invoke(context);
+                    signal.Set();
+                });
+            }
             builder.SetCancelable(Cancellable);
             builder.Create().Show();
         }
