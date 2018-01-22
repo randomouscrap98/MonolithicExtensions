@@ -18,6 +18,10 @@ namespace MonolithicExtensions.Windows
         private TextBoxWithPlaceholder PathBox = new TextBoxWithPlaceholder();
 
         public OpenFileDialog FileDialog { get; set; } = new OpenFileDialog();
+        public FolderBrowserDialog FolderDialog { get; set; } = new FolderBrowserDialog();
+
+        public bool UseFolderDialog { get; set; } = false;
+
         //public event Action<FilePathSelector, string> Text
 
         public override string Text
@@ -101,14 +105,25 @@ namespace MonolithicExtensions.Windows
 
         private void BrowseButton_Click(object sender, EventArgs e)
         {
-            if (FileDialog == null)
-                FileDialog = new OpenFileDialog();
-
-            var result = FileDialog.ShowDialog();
-
-            if(result == DialogResult.OK)
+            if (UseFolderDialog)
             {
-                Text = FileDialog.FileName;
+                if (FolderDialog == null)
+                    FolderDialog = new FolderBrowserDialog();
+
+                var result = FolderDialog.ShowDialog();
+
+                if (result == DialogResult.OK)
+                    Text = FolderDialog.SelectedPath;
+            }
+            else
+            {
+                if (FileDialog == null)
+                    FileDialog = new OpenFileDialog();
+
+                var result = FileDialog.ShowDialog();
+
+                if (result == DialogResult.OK)
+                    Text = FileDialog.FileName;
             }
         }
 

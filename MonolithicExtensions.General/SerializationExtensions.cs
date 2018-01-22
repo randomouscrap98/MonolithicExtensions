@@ -24,6 +24,8 @@ namespace MonolithicExtensions.General
             PreserveReferencesHandling = PreserveReferencesHandling.Objects
         };
 
+        //public static void ApplyDefault
+
         /// <summary>
         /// Save the given object to the given TextWriter stream. This is the lowest level way to save an object; you probably
         /// want something else, like SaveObject.
@@ -72,13 +74,23 @@ namespace MonolithicExtensions.General
         /// <returns></returns>
         public static T JsonParseFromStream<T>(ref TextReader stream)
         {
+            //T newObject = default(T);
+            //newObject = (T)serializer.Deserialize(stream, typeof(T));
+            return (T)JsonParseFromStream(ref stream, typeof(T));
+            //return newObject;
+        }
+
+        /// <summary>
+        /// Parse a json stream into an object of the desired type. The type does not have to be known at compile time.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static object JsonParseFromStream(ref TextReader stream, Type type)
+        {
             JsonConvert.DefaultSettings = () => defaultSettings;
-            T newObject = default(T);
-
             var serializer = JsonSerializer.CreateDefault();
-            newObject = (T)serializer.Deserialize(stream, typeof(T));
-
-            return newObject;
+            return serializer.Deserialize(stream, type);
         }
 
         /// <summary>
@@ -89,8 +101,23 @@ namespace MonolithicExtensions.General
         /// <returns></returns>
         public static T JsonParse<T>(string jsonString)
         {
+            return (T)JsonParse(jsonString, typeof(T));
+            //TextReader stream = new StringReader(jsonString);
+            //T result = JsonParseFromStream<T>(ref stream);
+            //stream.Dispose();
+            //return result; 
+        }
+
+        /// <summary>
+        /// Parse a json string into an object of the desired type. The type does not have to be known at compile time.
+        /// </summary>
+        /// <param name="jsonString"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static object JsonParse(string jsonString, Type type)
+        {
             TextReader stream = new StringReader(jsonString);
-            T result = JsonParseFromStream<T>(ref stream);
+            object result = JsonParseFromStream(ref stream, type);
             stream.Dispose();
             return result; 
         }
