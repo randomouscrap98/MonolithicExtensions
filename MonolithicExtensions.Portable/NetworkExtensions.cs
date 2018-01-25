@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 
@@ -11,6 +12,7 @@ namespace MonolithicExtensions.Portable
 {
     public static class NetworkServices
     {
+        public static int CRCStreamBufferSize = 4096;
         public const uint ITUV41Polynomial = 0x11021;
 
         public static uint ReverseBits(uint dword)
@@ -122,26 +124,42 @@ namespace MonolithicExtensions.Portable
         /// <returns></returns>
         public static byte[] CRC32(IList<byte> data, uint polynomial = 0x4c11db7, uint init = 0xffffffffu)
         {
+            return CRC32(new MemoryStream(data.ToArray()), polynomial, init);
+        }
+
+        /// <summary>
+        /// Produce a REGULAR CRC32 (the one used for Ethernet, GZip, PNG, etc.), or supply your own polynomial and initial value.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="polynomial"></param>
+        /// <param name="init"></param>
+        /// <returns></returns>
+        public static byte[] CRC32(Stream data, uint polynomial = 0x4c11db7, uint init = 0xffffffffu)
+        {
             uint crc = init;
-            foreach (uint dataByte in data)
+            byte[] buffer = new byte[CRCStreamBufferSize];
+            int bufferLength;
+            while ((bufferLength = data.Read(buffer, 0, CRCStreamBufferSize)) > 0)
             {
-                uint currentByte = ReverseBits(dataByte);
-                for (int i = 0; i <= 7; i++)
+                for (int b = 0; b < bufferLength; b++)
                 {
-                    if (((crc ^ currentByte) & 0x80000000u) > 0)
+                    uint currentByte = ReverseBits(buffer[b]);
+                    for (int i = 0; i <= 7; i++)
                     {
-                        crc = (crc << 1) ^ polynomial;
+                        if (((crc ^ currentByte) & 0x80000000u) > 0)
+                        {
+                            crc = (crc << 1) ^ polynomial;
+                        }
+                        else
+                        {
+                            crc = crc << 1;
+                        }
+                        currentByte <<= 1;
                     }
-                    else
-                    {
-                        crc = crc << 1;
-                    }
-                    currentByte <<= 1;
                 }
             }
             return BitConverter.GetBytes(ReverseBits(~crc)).ToArray();
         }
-
     }
 
     //=======================================================

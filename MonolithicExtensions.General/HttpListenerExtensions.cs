@@ -10,6 +10,20 @@ namespace MonolithicExtensions.General
     public static class HttpListenerExtensions
     {
         /// <summary>
+        /// Simply writes the OK status back. Can alternatively specify a different code
+        /// </summary>
+        /// <param name="response"></param>
+        /// <param name="statusCode"></param>
+        /// <param name="statusDescription"></param>
+        public static void WriteEmptyResponse(this HttpListenerResponse response, int statusCode = 204,
+            string statusDescription = "OK - No content")
+        {
+            response.StatusCode = statusCode;
+            response.StatusDescription = statusDescription;
+            response.Close();
+        }
+
+        /// <summary>
         /// A blocking function used to simplify the entire process of responding with a JSON object.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -20,10 +34,23 @@ namespace MonolithicExtensions.General
         public static void WriteJsonResponse<T>(this HttpListenerResponse response, T responseObject, 
             int statusCode = 200, string statusDescription = "OK")
         {
+            WriteJsonStringResponse(response, MySerialize.JsonStringify(responseObject), statusCode, statusDescription);
+        }
+
+        /// <summary>
+        /// A blocking function used to simplify the process of responding with a JSON object
+        /// </summary>
+        /// <param name="response"></param>
+        /// <param name="json"></param>
+        /// <param name="statusCode"></param>
+        /// <param name="statusDescription"></param>
+        public static void WriteJsonStringResponse(this HttpListenerResponse response, string json,
+            int statusCode = 200, string statusDescription = "OK")
+        {
             response.StatusCode = statusCode;
             response.StatusDescription = statusDescription;
             response.ContentType = "application/json";
-            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(MySerialize.JsonStringify<T>(responseObject));
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(json);
             response.ContentLength64 = buffer.Length;
             response.Close(buffer, true);
         }

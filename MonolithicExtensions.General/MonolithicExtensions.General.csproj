@@ -54,8 +54,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileSystemExtensions.cs" />
+    <Compile Include="HttpClientExtensions.cs" />
     <Compile Include="HttpListenerExtensions.cs" />
-    <Compile Include="IRemoteCallService.cs" />
+    <Compile Include="HttpRemoteCallClient.cs" />
+    <Compile Include="HttpRemoteCallServer.cs" />
+    <Compile Include="RemoteCallSystem.cs" />
     <Compile Include="JsonRemoteCallService.cs" />
     <Compile Include="Log4NetExtensions.cs" />
     <Compile Include="SerializationExtensions.cs" />

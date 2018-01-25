@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using MonolithicExtensions.Windows;
+using System.IO;
 
 namespace MonolithicExtensions.UnitTest
 {
@@ -46,6 +47,8 @@ namespace MonolithicExtensions.UnitTest
         [TestMethod()]
         public void CRC32Test()
         {
+            LogStart("CRC32Test");
+
             Action<uint, uint> testReverse = (uint original, uint expected) => { Assert.IsTrue(NetworkServices.ReverseBits(original) == expected); };
 
             Action<string, uint> testCRC32 = (string data, uint expected) =>
@@ -66,6 +69,24 @@ namespace MonolithicExtensions.UnitTest
             testCRC32("A", 0xd3d99e8bu);
             testCRC32("0", 0xf4dbdf21u);
             testCRC32("This is just a test string that should be long enough and weird enough to catch ERRORS!", 0x6684ac42u);
+
+            DateTime start;
+            uint result;
+
+            //And now the big one: will a huge file still produce the right crc32 using the stream method?
+            using (FileStream f = new FileStream("MediaCreationTool.exe", FileMode.Open))
+            {
+                start = DateTime.Now;
+                result = BitConverter.ToUInt32(NetworkServices.CRC32(f), 0);
+                Logger.Info($"CRC32 of 17.7mb file took {(DateTime.Now - start).ToSimplePhrase()}");
+                Assert.IsTrue(result == 0x5a2DD3B4);
+            }
+
+            //Oh and might as well test time for normal... crc
+            //start = DateTime.Now;
+            //result = BitConverter.ToUInt32(NetworkServices.CRC32(File.ReadAllBytes("MediaCreationTool.exe")), 0);
+            //Logger.Info($"CRC32 of 17.7mb file took {(DateTime.Now - start).ToSimplePhrase()}");
+            //Assert.IsTrue(result == 0x5a2DD3B4);
         }
 
     }
