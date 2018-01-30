@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleExtensions.cs" />
     <Compile Include="FileSystemExtensions.cs" />
     <Compile Include="HttpClientExtensions.cs" />
     <Compile Include="HttpListenerExtensions.cs" />

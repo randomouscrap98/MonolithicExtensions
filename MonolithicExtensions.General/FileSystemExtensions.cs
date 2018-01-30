@@ -91,7 +91,6 @@ namespace MonolithicExtensions.General
                 ForceDelete(destination, realTimeout);
             ThreadingServices.WaitOnAction(() => File.Copy(source, destination, true), realTimeout);
         }
-
     }
 
     public static class DirectoryExtensions
