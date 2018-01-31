@@ -262,14 +262,14 @@ namespace MonolithicExtensions.General
                 {
                     bool redrawList = true;
 
-                    if (key.Key == ConsoleKey.DownArrow)
-                        selected = (selected + 1) % config.ListDisplayCount;
-                    else if (key.Key == ConsoleKey.UpArrow)
-                        selected = (config.ListDisplayCount + selected - 1) % config.ListDisplayCount;
-                    else if (key.Key == ConsoleKey.RightArrow)
-                        page = (page + 1) % pages;
-                    else if (key.Key == ConsoleKey.LeftArrow)
-                        page = (pages + page - 1) % pages;
+                    if (key.Key == ConsoleKey.DownArrow && selected < config.ListDisplayCount - 1)
+                        selected++;// = (selected + 1) % config.ListDisplayCount;
+                    else if (key.Key == ConsoleKey.UpArrow && selected > 0)//selected < config.ListDisplayCount - 1)
+                        selected--;// = (config.ListDisplayCount + selected - 1) % config.ListDisplayCount;
+                    else if (key.Key == ConsoleKey.RightArrow && page < pages - 1)
+                        page++;// = (page + 1) % pages;
+                    else if (key.Key == ConsoleKey.LeftArrow && page > 0)
+                        page--;// = (pages + page - 1) % pages;
                     else
                         redrawList = false;
 
