@@ -94,6 +94,37 @@ namespace MonolithicExtensions.UnitTest
 
         }
 
+        [TestMethod]
+        public void TestTimeout()
+        {
+            LogStart("TestTimeout");
+
+            int value = 0;
+            ThreadingServices.Timeout(TimeSpan.FromMilliseconds(300), () => value = 5);
+            Assert.IsTrue(value == 0);
+            Thread.Sleep(400);
+            Assert.IsTrue(value == 5);
+
+            var source = new CancellationTokenSource();
+            ThreadingServices.Timeout(TimeSpan.FromMilliseconds(300), (c) => value = 10, source.Token);
+            source.Cancel();
+            Assert.IsTrue(value == 5);
+            Thread.Sleep(400);
+            Assert.IsTrue(value == 5);
+        }
+
+        [TestMethod]
+        public void TestSimpleProcessStart()
+        {
+            LogStart("TestSimpleProcessStart");
+
+            var source = new CancellationTokenSource();
+            var task = ProcessServices.StartProcess("helloOutput.bat", "", source.Token);//.Wait(TimeSpan.FromSeconds(1));
+            task.Wait(TimeSpan.FromSeconds(1));
+            Assert.IsTrue(task.Result.ExitCode == 66);
+            Assert.IsTrue(task.Result.Output.Trim() == "Hello output!");
+            Assert.IsTrue(task.Result.Error.Trim() == "Hello error!");
+        }
     }
 
     //=======================================================

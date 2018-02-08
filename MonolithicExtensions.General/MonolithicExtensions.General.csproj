@@ -64,7 +64,7 @@
     <Compile Include="Log4NetExtensions.cs" />
     <Compile Include="SerializationExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ThreadingExtensions.cs" />
+    <Compile Include="ThreadAndProcessExtensions.cs" />
     <Compile Include="websocketWrapper.cs" />
   </ItemGroup>
   <ItemGroup>

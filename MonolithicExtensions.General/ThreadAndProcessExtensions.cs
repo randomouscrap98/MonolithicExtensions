@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MonolithicExtensions.Portable.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -115,14 +117,170 @@ namespace MonolithicExtensions.General
                 }
             }
         }
+
+        public static void Timeout(TimeSpan time, Action<CancellationToken> runner, CancellationToken token)
+        {
+            var timer = new System.Timers.Timer(time.TotalMilliseconds);
+            timer.Elapsed += (o, e) =>
+            {
+                timer.Enabled = false;
+
+                if(!token.IsCancellationRequested)
+                    runner.Invoke(token);
+
+                timer.Dispose();
+            };
+            timer.Enabled = true;
+        }
+
+        /// <summary>
+        /// WARNING: Non-cancellable. Try not to use this version unless you're really lazy and really confident.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="runner"></param>
+        public static void Timeout(TimeSpan time, Action runner)
+        {
+            var timer = new System.Timers.Timer(time.TotalMilliseconds);
+            timer.Elapsed += (o, e) =>
+            {
+                timer.Enabled = false;
+                runner.Invoke();
+                timer.Dispose();
+            };
+            timer.Enabled = true;
+        }
     }
 
     public static class ProcessServices
     {
+        private static ILogger Logger = LogServices.CreateLoggerFromDefault(typeof(ProcessServices));
+
+        public static TimeSpan ProcessPollingInterval = TimeSpan.FromSeconds(1);
+
         public static bool MightBeService(this Process TestProcess)
         {
             TestProcess.Refresh();
             return TestProcess.MainWindowHandle == IntPtr.Zero;
+        }
+
+        public class ProcessResult
+        {
+            public int ExitCode = 0;
+            public string Output = null;
+            public string Error = null;
+        }
+        
+        public static async Task<ProcessResult> StartProcess(string executable, string arguments, CancellationToken token, string workingDirectory = null)//, bool separateExecution)
+        {
+            Logger.Trace($"StartProcess called for executable {executable} and arguments {arguments}");
+            var info = new ProcessStartInfo(executable, arguments);
+
+            //if (separateExecution)
+            //{
+            //    Logger.Debug($"Executable {executable} will be started independently and will not be monitored");
+            //    testProcessInfo.UseShellExecute = True
+            //    testProcessInfo.RedirectStandardError = False
+            //    testProcessInfo.RedirectStandardOutput = False
+            //    testProcessInfo.CreateNoWindow = False
+            //}
+            //Else
+            info.UseShellExecute = false;
+            info.RedirectStandardError = true;
+            info.RedirectStandardOutput = true;
+            info.CreateNoWindow = true;
+            //End If
+
+            var executableDirectory = System.IO.Path.GetDirectoryName(executable);
+
+            if (!string.IsNullOrWhiteSpace(workingDirectory))
+                info.WorkingDirectory = workingDirectory;
+            else if (!string.IsNullOrWhiteSpace(executableDirectory))
+                info.WorkingDirectory = executableDirectory;
+
+            var process = new Process();
+            process.StartInfo = info;
+
+            var errors = new StringBuilder();
+            var output = new StringBuilder();
+            var result = new ProcessResult();
+
+            using (var outputWaitHandle = new AutoResetEvent(false))
+            {
+                using (var errorWaitHandle = new AutoResetEvent(false))
+                {
+                    //What to do when the process buffers a line of stdout
+                    var outputHandler = new DataReceivedEventHandler((s, e) => //Action<object, DataReceivedEventArgs>((s, e) =>
+                    {
+                        if (e.Data == null)
+                            outputWaitHandle.Set();
+                        else
+                            output.AppendLine(e.Data);
+                    });
+
+                    //What to do when the process buffers a line of stderr
+                    var errorHandler = new DataReceivedEventHandler((s, e) => //new Action<object, DataReceivedEventArgs>((s, e) =>
+                    {
+                        if (e.Data == null)
+                            errorWaitHandle.Set();
+                        else
+                            errors.AppendLine(e.Data);
+                    });
+
+                    bool processExited = false;
+                    bool outputExited = false;
+
+                    try
+                    {
+                        process.OutputDataReceived += outputHandler;
+                        process.ErrorDataReceived += errorHandler;
+
+                        //NOW start the process since... you know, we have the handlers
+                        process.Start();
+                        process.BeginOutputReadLine();
+                        process.BeginErrorReadLine();
+
+                        //Nice kinda asynchronous whatever. IDK
+                        await Task.Run(() =>
+                        {
+                            //Keep polling the process until it exits. Or quit entirely if the user cancelled.
+                            while (!processExited)
+                            {
+                                processExited = process.WaitForExit((int)ProcessPollingInterval.TotalMilliseconds); //WaitForExit(CType(ExecutableTimeout.TotalMilliseconds, Integer))
+                                if(token.IsCancellationRequested && !processExited)
+                                {
+                                    Logger.Warn($"User cancelled process {executable} before process was complete!");
+                                    break;
+                                }
+                            }
+
+                            outputExited = outputWaitHandle.WaitOne(ProcessPollingInterval) && errorWaitHandle.WaitOne(ProcessPollingInterval);
+                        });
+
+                        //Force close the process if it didn't exit nicely.
+                        if(!processExited)
+                        {
+                            process.Close();
+                            throw new InvalidOperationException("Cancelled before process was able to finish!");
+                        }
+                    }
+                    finally
+                    {
+                        process.OutputDataReceived -= outputHandler;
+                        process.ErrorDataReceived -= errorHandler;
+                    }
+
+                    result.Output = output.ToString();
+                    result.Error = errors.ToString();
+                    result.ExitCode = process.ExitCode;
+
+                    Logger.Debug($"Output for executable {executable} (exit code {result.ExitCode}): {result.Output}");
+
+                    if (!string.IsNullOrEmpty(result.Error))
+                        Logger.Warn($"Error output for executable {executable}: {result.Error}");
+
+                    return result;
+                }
+            }
         }
     }
 
