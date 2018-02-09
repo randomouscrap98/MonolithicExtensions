@@ -119,11 +119,34 @@ namespace MonolithicExtensions.UnitTest
             LogStart("TestSimpleProcessStart");
 
             var source = new CancellationTokenSource();
-            var task = ProcessServices.StartProcess("helloOutput.bat", "", source.Token);//.Wait(TimeSpan.FromSeconds(1));
+            var task = ProcessServices.RunProcess("helloOutput.bat", "", source.Token);//.Wait(TimeSpan.FromSeconds(1));
             task.Wait(TimeSpan.FromSeconds(1));
             Assert.IsTrue(task.Result.ExitCode == 66);
             Assert.IsTrue(task.Result.Output.Trim() == "Hello output!");
             Assert.IsTrue(task.Result.Error.Trim() == "Hello error!");
+        }
+
+        [TestMethod]
+        public void TestProcessCancel()
+        {
+            LogStart("TestProcessCancel");
+
+            var source = new CancellationTokenSource();
+            var task = ProcessServices.RunProcess("pause.bat", "", source.Token);//.Wait(TimeSpan.FromSeconds(1));
+            source.Cancel();
+
+            try
+            {
+                task.Wait();
+                Assert.Fail();
+            }
+            catch(Exception ex)
+            {
+                Logger.Info($"Got (expected?) exception from process cancel: {ex}");
+            }
+
+            //MyAssert.ThrowsException(() => task.Wait());
+            //task.Wait(TimeSpan.FromSeconds(1));
         }
     }
 

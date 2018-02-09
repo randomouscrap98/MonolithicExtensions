@@ -91,7 +91,7 @@ namespace MonolithicExtensions.General
                         currentTasks.RemoveAll(x => x.IsCompleted || x.IsCanceled || x.IsFaulted);
 
                         if (currentTasks.Count != oldCount)
-                            Logger.Debug($"Removed {oldCount - currentTasks.Count} completed tasks from list");
+                            Logger.Trace($"Removed {oldCount - currentTasks.Count} completed tasks from list");
 
                         currentTasks.Add(Task.Run(() => HandleRequest(context, token), token));
                     }

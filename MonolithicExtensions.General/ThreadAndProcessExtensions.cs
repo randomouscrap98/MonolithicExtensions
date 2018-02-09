@@ -155,7 +155,7 @@ namespace MonolithicExtensions.General
     {
         private static ILogger Logger = LogServices.CreateLoggerFromDefault(typeof(ProcessServices));
 
-        public static TimeSpan ProcessPollingInterval = TimeSpan.FromSeconds(1);
+        public static TimeSpan ProcessPollingInterval = TimeSpan.FromMilliseconds(100);
 
         public static bool MightBeService(this Process TestProcess)
         {
@@ -170,7 +170,7 @@ namespace MonolithicExtensions.General
             public string Error = null;
         }
         
-        public static async Task<ProcessResult> StartProcess(string executable, string arguments, CancellationToken token, string workingDirectory = null)//, bool separateExecution)
+        public static async Task<ProcessResult> RunProcess(string executable, string arguments, CancellationToken token, string workingDirectory = null)//, bool separateExecution)
         {
             Logger.Trace($"StartProcess called for executable {executable} and arguments {arguments}");
             var info = new ProcessStartInfo(executable, arguments);
@@ -242,6 +242,7 @@ namespace MonolithicExtensions.General
                         //Nice kinda asynchronous whatever. IDK
                         await Task.Run(() =>
                         {
+
                             //Keep polling the process until it exits. Or quit entirely if the user cancelled.
                             while (!processExited)
                             {
@@ -256,22 +257,26 @@ namespace MonolithicExtensions.General
                             outputExited = outputWaitHandle.WaitOne(ProcessPollingInterval) && errorWaitHandle.WaitOne(ProcessPollingInterval);
                         });
 
-                        //Force close the process if it didn't exit nicely.
+                        //Force close the process if it didn't exit nicely. We MUST do this outside the Task.Run
+                        //because throwing exceptions from within a task is um... not always nice to handle.
                         if(!processExited)
                         {
-                            process.Close();
-                            throw new InvalidOperationException("Cancelled before process was able to finish!");
+                            process.Kill(); //Close();
+                            throw new OperationCanceledException("Cancelled process before it was able to finish!");
+                            //throw new InvalidOperationException("Cancelled before process was able to finish!");
                         }
+
+                        result.ExitCode = process.ExitCode;
                     }
                     finally
                     {
                         process.OutputDataReceived -= outputHandler;
                         process.ErrorDataReceived -= errorHandler;
+                        process.Dispose();
                     }
 
                     result.Output = output.ToString();
                     result.Error = errors.ToString();
-                    result.ExitCode = process.ExitCode;
 
                     Logger.Debug($"Output for executable {executable} (exit code {result.ExitCode}): {result.Output}");
 
