@@ -122,6 +122,14 @@ namespace MonolithicExtensions.UnitTest
             time = TimeSpan.FromDays(900);
             Assert.IsTrue(time.ToSimplePhrase(0) == "2 years");
             //Assert.IsTrue(time.ToSimplePhrase(1) = "1.3 days")
+
+            //Also: military time
+            string result = TimeSpan.FromHours(13).ToMilitaryTime();// == "1300");
+            Assert.IsTrue(result == "1300");
+            result = TimeSpan.FromHours(23.5).ToMilitaryTime();
+            Assert.IsTrue(result == "2330");
+            result = TimeSpan.FromHours(5.11).ToMilitaryTime();
+            Assert.IsTrue(result == "0506:36");
         }
 
 

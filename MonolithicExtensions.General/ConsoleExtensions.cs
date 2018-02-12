@@ -21,6 +21,12 @@ namespace MonolithicExtensions.General
             //public Action<ConsoleKeyInfo> ProcessUnusedKey = null;
         }
 
+        public static class FieldRequestSelections
+        {
+            public static List<string> Bool() { return new List<string> { "true", "false" }; }
+            public static List<string> Enumeration<T>() { return Enum.GetNames(typeof(T)).ToList(); }
+        }
+
         /// <summary>
         /// Many console operations require changing color and location at the same time; use this to accomplish
         /// that quickly.
@@ -80,6 +86,11 @@ namespace MonolithicExtensions.General
 
         public static Dictionary<string, string> TopCascadingRequestFields(int top, IList<string> fields, Configuration config = null)
         {
+            return TopCascadingRequestFields(top, fields.ToDictionary(x => x, y => (IList<string>)null), config);
+        }
+
+        public static Dictionary<string, string> TopCascadingRequestFields(int top, IDictionary<string, IList<string>> fields, Configuration config = null)
+        {
             var oldbg = Console.BackgroundColor;
             var oldfg = Console.ForegroundColor;
             var oldx = Console.CursorLeft;
@@ -90,17 +101,54 @@ namespace MonolithicExtensions.General
             Console.SetCursorPosition(0, top);
 
             var result = new Dictionary<string, string>();
-            var width = fields.Select(x => x.Length).Max();
+            var width = fields.Keys.Select(x => x.Length).Max();
 
-            foreach (string field in fields)
+            foreach (var field in fields)
             {
                 SetColor(config.OutputFG, config.OutputBG);
                 Console.Write(" ");
-                Console.Write(field.PadRight(width));
+                Console.Write(field.Key.PadRight(width));
                 Console.Write(" ");
-                SetColor(config.OutputBG, config.OutputFG);
-                Console.Write(" ");
-                result.Add(field, Console.ReadLine());
+
+                if (field.Value == null || field.Value.Count == 0)
+                {
+                    SetColor(config.OutputBG, config.OutputFG);
+                    Console.Write(" ");
+                    result.Add(field.Key, Console.ReadLine());
+                }
+                else
+                {
+                    int cursorX = Console.CursorLeft + 1;
+                    int cursorY = Console.CursorTop;
+                    int i = 0;
+                    string selection = "";
+                    int valueWidth = field.Value.Select(x => x.Length).Max();
+
+                    while(string.IsNullOrWhiteSpace(selection))
+                    {
+                        QuickSet(config.SelectFG, config.SelectBG, cursorX, cursorY);
+                        Console.Write($" {field.Value[i]} ");
+
+                        if (field.Value[i].Length < valueWidth)
+                        {
+                            SetColor(config.ClearColor, config.ClearColor);
+                            Console.Write(new string(' ', (valueWidth - field.Value[i].Length)));
+                        }
+
+                        var info = Console.ReadKey(true);
+
+                        if (info.Key == ConsoleKey.Enter)
+                            selection = field.Value[i];
+                        else if ((info.Key == ConsoleKey.UpArrow || info.Key == ConsoleKey.LeftArrow) && i > 0)
+                            i--;
+                        else if ((info.Key == ConsoleKey.DownArrow || info.Key == ConsoleKey.RightArrow) && i < field.Value.Count - 1)
+                            i++;
+                    }
+
+                    result.Add(field.Key, selection);
+
+                    Console.WriteLine();
+                }
             }
 
             var bottom = Console.CursorTop;

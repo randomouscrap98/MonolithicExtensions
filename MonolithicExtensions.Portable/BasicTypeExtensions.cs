@@ -334,6 +334,24 @@ namespace MonolithicExtensions.Portable
                 return String.Format("{0:F" + decimalPlaces + "} {1}", value, unit.Pluralize(value));
             }
         }
+
+        public static string ToMilitaryTime(this TimeSpan time)//, bool includeColon = false)
+        {
+            if (time.TotalHours > 24 || time.TotalHours < 0)
+                throw new InvalidOperationException("Invalid time range!");
+
+            var hours = (int)time.TotalHours;
+            var minutes = ((int)time.TotalMinutes) % 60;//60 * (time.TotalHours - hours);
+            var seconds = ((int)time.TotalSeconds) % 60;
+
+            var builder = new StringBuilder($"{hours.ToString().PadLeft(2, '0')}{minutes.ToString().PadLeft(2, '0')}");
+
+            if (seconds > 0)
+                builder.Append($":{seconds.ToString().PadLeft(2, '0')}");
+
+            return builder.ToString();
+                //String.Format("{0:F" + 2 + "}", time.TotalHours).Replace(".", (includeColon ? ":" : ""));
+        }
     }
 
     /// <summary>
