@@ -352,6 +352,14 @@ namespace MonolithicExtensions.General
                 { "No", (i) => true}
             }, config) == "Yes";
         }
+
+        public static void TopCascadingMessage(int top, string output, Configuration config = null)
+        {
+            TopCascadingMenu(top, output, new Dictionary<string, Func<int, bool>>() {
+                { "OK", (i) => true }
+            }, config);
+        }
+
         //public static void TopListMenu<T>(int top, string output, Dictionary<T, string> items, int displayCount,
         //    Dictionary<string, Func<int, T, bool>> menuOptions, MenuConfiguration config = null)
         //{
