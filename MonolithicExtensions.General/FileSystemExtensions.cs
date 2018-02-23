@@ -122,14 +122,16 @@ namespace MonolithicExtensions.General
             if (timeout == null)
                 timeout = TimeSpan.FromSeconds(3);
             TimeSpan realTimeout = (TimeSpan)timeout;
+            DateTime start = DateTime.Now;
             foreach (var filename in Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories))
             {
                 if (File.GetAttributes(filename) != FileAttributes.Normal)
                 {
-                    ThreadingServices.WaitOnAction(() => File.SetAttributes(filename, FileAttributes.Normal), realTimeout);
+                    ThreadingServices.WaitOnAction(() => File.SetAttributes(filename, FileAttributes.Normal), realTimeout - (DateTime.Now - start));
                 }
             }
-            ThreadingServices.WaitOnAction(() => Directory.Delete(directoryPath, true), realTimeout);
+            ThreadingServices.WaitOnAction(() => Directory.Delete(directoryPath, true), realTimeout - (DateTime.Now - start));
+            ThreadingServices.WaitOnAction(() => { if (Directory.Exists(directoryPath)) throw new Exception("Directory still exists"); }, realTimeout - (DateTime.Now - start));
         }
 
     }

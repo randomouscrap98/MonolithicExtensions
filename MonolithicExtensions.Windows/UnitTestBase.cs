@@ -16,15 +16,32 @@ namespace MonolithicExtensions.Windows
     public class UnitTestBase
     {
         public ILogger Logger;
+        public readonly string TestName;// = "UnitTest";
 
         public UnitTestBase(string name = null)
         {
-            Log4NetExtensions.SetupDebugLogger("UnitTest");
+            if(name == null)
+            {
+                name = this.GetType().Name;
+            }
+
+            TestName = name;
+
+            Log4NetExtensions.SetupDebugLogger($"Unit_{name}");
             Log4NetExtensions.SetLog4NetAsDefaultLogger();
-            if (name == null)
-                Logger = LogServices.CreateLoggerFromDefault(this.GetType());
-            else
-                Logger = LogServices.CreateLoggerFromDefault(name);
+            Logger = LogServices.CreateLoggerFromDefault(name);
+
+            //if (name != null)
+            //{
+            //    Logger = LogServices.CreateLoggerFromDefault(this.GetType());
+            //}
+            //else
+            //{
+            //    Log4NetExtensions.SetupDebugLogger("UnitTest");
+            //}
+
+            //if (name == null)
+            //else
         }
 
         public void LogStart(string functionName)

@@ -12,7 +12,7 @@ namespace MonolithicExtensions.General
     public class HttpRemoteCallClientConfig
     {
         public TimeSpan CommunicationTimeout = TimeSpan.FromSeconds(10);
-        public string Endpoint = ""; //ALWAYS must be set!
+        //public string Endpoint = ""; //ALWAYS must be set!
     }
 
     public class HttpRemoteCallClient : IRemoteCallClient
@@ -22,6 +22,8 @@ namespace MonolithicExtensions.General
         protected IRemoteCallService remoteService;
         protected HttpRemoteCallClientConfig config;
         protected HttpClient client;
+
+        public string Endpoint { get; set; }
 
         public HttpRemoteCallClient(IRemoteCallService remoteService, HttpRemoteCallClientConfig config)
         {
@@ -35,7 +37,7 @@ namespace MonolithicExtensions.General
         public async Task<T> Call<T>(MethodBase method, IEnumerable<object> parameters)
         {
             string request = remoteService.CreateCall(method, parameters);
-            HttpResponseMessage result = await client.PostAsync(config.Endpoint, new StringContent(request, Encoding.UTF8));
+            HttpResponseMessage result = await client.PostAsync(Endpoint, new StringContent(request, Encoding.UTF8));
             if(result.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 var message = $"Unexpected response from server: HTTP code {result.StatusCode} : {result.ReasonPhrase}";
@@ -49,7 +51,7 @@ namespace MonolithicExtensions.General
         public async Task CallVoid(MethodBase method, IEnumerable<object> parameters)
         {
             string request = remoteService.CreateCall(method, parameters);
-            HttpResponseMessage result = await client.PostAsync(config.Endpoint, new StringContent(request));
+            HttpResponseMessage result = await client.PostAsync(Endpoint, new StringContent(request));
             if(result.StatusCode != System.Net.HttpStatusCode.NoContent)
             {
                 var message = $"Unexpected response from server: HTTP code {result.StatusCode} : {result.ReasonPhrase}";

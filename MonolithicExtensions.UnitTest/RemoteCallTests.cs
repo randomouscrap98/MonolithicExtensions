@@ -51,16 +51,17 @@ namespace PortableExtensions.UnitTest
         {
             LogStart("TestHttpRemoteCall");
 
-            var clientConfig = new HttpRemoteCallClientConfig() { Endpoint = "http://localhost:45677/" + RemoteCallService };
-            var serverConfig = new HttpRemoteCallServerConfig() { BaseAddress = "http://+:45677" };
+            //var clientConfig = new HttpRemoteCallClientConfig();// { Endpoint = "http://localhost:45677/" + RemoteCallService };
+            //var serverConfig = new HttpRemoteCallServerConfig();// { BaseAddress = "http://+:45677" };
             var serverService = new SimpleService();
             var serviceType = typeof(SimpleService);
 
-            var server = new HttpRemoteCallServer(new JsonRemoteCallService(), serverConfig);
-            var client = new HttpRemoteCallClient(new JsonRemoteCallService(), clientConfig);
+            var server = new HttpRemoteCallServer(new JsonRemoteCallService(), new HttpRemoteCallServerConfig());//serverConfig);
+            var client = new HttpRemoteCallClient(new JsonRemoteCallService(), new HttpRemoteCallClientConfig());
 
-            server.Start(new Dictionary<string, object>() { { RemoteCallService, serverService } });
+            server.Start("http://+:45677", new Dictionary<string, object>() { { RemoteCallService, serverService } });
 
+            client.Endpoint = $"http://localhost:45677/{RemoteCallService}";
             int result = client.Call<int>(serviceType.GetMethod("AddNumbers"), new List<object>() { 5, 6 }).Result;
             Assert.IsTrue(result == 11);
 

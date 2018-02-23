@@ -19,7 +19,7 @@ namespace MonolithicExtensions.UnitTest
         [TestMethod()]
         public void CRC16Test()
         {
-            Func<IList<byte>, byte[]> CRCFunction = NetworkServices.CRC16_XMODEM;
+            Func<IList<byte>, byte[]> CRCFunction = HashServices.CRC16_XMODEM;
 
             Action<string, int> testCRC16 = (string data, int expected) =>
             {
@@ -28,15 +28,15 @@ namespace MonolithicExtensions.UnitTest
                 Assert.IsTrue(crcValue == expected);
             };
 
-            CRCFunction = NetworkServices.CRC16_CCITTFalse;
+            CRCFunction = HashServices.CRC16_CCITTFalse;
             testCRC16("A", 0x9479);
             testCRC16("0", 0xfacf);
             testCRC16("123456789", 0xe5cc);
-            CRCFunction = NetworkServices.CRC16_XMODEM;
+            CRCFunction = HashServices.CRC16_XMODEM;
             testCRC16("A", 0x58e5);
             testCRC16("0", 0x3653);
             testCRC16("123456789", 0x31c3);
-            CRCFunction = NetworkServices.CRC16_KERMIT;
+            CRCFunction = HashServices.CRC16_KERMIT;
             testCRC16("A", 0x8d53);
             testCRC16("0", 0x8331);
             testCRC16("123456789", 0x8921);
@@ -49,11 +49,11 @@ namespace MonolithicExtensions.UnitTest
         {
             LogStart("CRC32Test");
 
-            Action<uint, uint> testReverse = (uint original, uint expected) => { Assert.IsTrue(NetworkServices.ReverseBits(original) == expected); };
+            Action<uint, uint> testReverse = (uint original, uint expected) => { Assert.IsTrue(HashServices.ReverseBits(original) == expected); };
 
             Action<string, uint> testCRC32 = (string data, uint expected) =>
             {
-                byte[] crc = NetworkServices.CRC32(Encoding.ASCII.GetBytes(data));
+                byte[] crc = HashServices.CRC32(Encoding.ASCII.GetBytes(data));
                 uint crcValue = BitConverter.ToUInt32(crc, 0);
                 Assert.IsTrue(crcValue == expected);
             };
@@ -63,7 +63,7 @@ namespace MonolithicExtensions.UnitTest
             testReverse(0x4, 0x20000000u);
             testReverse(0x8, 0x10000000u);
             testReverse(0xd2d15a39u, 0x9c5a8b4bu);
-            Assert.IsFalse(NetworkServices.ReverseBits(0xd2d15a39u) == 0x9c5b8b4bu);
+            Assert.IsFalse(HashServices.ReverseBits(0xd2d15a39u) == 0x9c5b8b4bu);
 
             testCRC32("123456789", 0xcbf43926u);
             testCRC32("A", 0xd3d99e8bu);
@@ -77,7 +77,7 @@ namespace MonolithicExtensions.UnitTest
             using (FileStream f = new FileStream("MediaCreationTool.exe", FileMode.Open))
             {
                 start = DateTime.Now;
-                result = BitConverter.ToUInt32(NetworkServices.CRC32(f), 0);
+                result = BitConverter.ToUInt32(HashServices.CRC32(f), 0);
                 Logger.Info($"CRC32 of 17.7mb file took {(DateTime.Now - start).ToSimplePhrase()}");
                 Assert.IsTrue(result == 0x5a2DD3B4);
             }

@@ -36,14 +36,16 @@ namespace MonolithicExtensions.General
 
     public interface IRemoteCallClient
     {
+        string Endpoint { get; set; }
         Task CallVoid(MethodBase method, IEnumerable<object> parameters);
         Task<T> Call<T>(MethodBase method, IEnumerable<object> parameters);
     }
 
     public interface IRemoteCallServer
     {
+        //string BaseAddress { get; set; }
         //object CallInterface { get; set; }
-        void Start(Dictionary<string, object> services);
+        void Start(string baseAddress, Dictionary<string, object> services);
         void Stop();
     }
 
@@ -59,7 +61,7 @@ namespace MonolithicExtensions.General
         public RemoteCallCommunicationException(string Message, Exception InnerException) : base(Message, InnerException) { }
     }
 
-    public class RemoteCallEndpointException : RemoteCallCommunicationException
+    public class RemoteCallEndpointException : RemoteCallException
     {
         public RemoteCallEndpointException(string Message) : base(Message) { }
         public RemoteCallEndpointException(string Message, Exception InnerException) : base(Message, InnerException) { }

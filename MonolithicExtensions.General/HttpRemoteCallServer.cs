@@ -13,7 +13,7 @@ namespace MonolithicExtensions.General
 {
     public class HttpRemoteCallServerConfig
     {
-        public string BaseAddress = ""; //MUST be set by caller!
+        //public string BaseAddress = ""; //MUST be set by caller!
         public TimeSpan ShutdownTimeout = TimeSpan.FromSeconds(10);
     }
 
@@ -33,6 +33,13 @@ namespace MonolithicExtensions.General
         private readonly object currentTaskLock = new object();
         private CancellationTokenSource cancelSource = null;
 
+        //public string BaseAddress { get; set; }
+        //public string BaseAddress
+        //{
+        //    get { return config.BaseAddress; }
+        //    set { }
+        //}
+
         public HttpRemoteCallServer(IRemoteCallService remoteService, HttpRemoteCallServerConfig config)
         {
             Logger = LogServices.CreateLoggerFromDefault(GetType());
@@ -40,7 +47,7 @@ namespace MonolithicExtensions.General
             this.remoteService = remoteService;
         }
 
-        public void Start(Dictionary<string, object> services)
+        public void Start(string BaseAddress, Dictionary<string, object> services)
         {
             Logger.Trace("HttpRemoteCallServer Start");
 
@@ -55,7 +62,7 @@ namespace MonolithicExtensions.General
 
             foreach (var service in services)
             {
-                var endpoint = $"{config.BaseAddress.TrimEnd("/".ToCharArray())}/{service.Key}";
+                var endpoint = $"{BaseAddress.TrimEnd("/".ToCharArray())}/{service.Key}";
                 if (!endpoint.EndsWith("/")) endpoint += "/";
                 Logger.Debug($"Setting up HttpListener to use endpoint {endpoint}...");
                 listener.Prefixes.Add(endpoint);

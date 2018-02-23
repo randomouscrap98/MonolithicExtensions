@@ -10,7 +10,7 @@ using System.Net.NetworkInformation;
 
 namespace MonolithicExtensions.Portable
 {
-    public static class NetworkServices
+    public static class HashServices
     {
         public static int CRCStreamBufferSize = 4096;
         public const uint ITUV41Polynomial = 0x11021;
@@ -160,6 +160,8 @@ namespace MonolithicExtensions.Portable
             }
             return BitConverter.GetBytes(ReverseBits(~crc)).ToArray();
         }
+
+        //public static IPEndpoint 
     }
 
     //=======================================================

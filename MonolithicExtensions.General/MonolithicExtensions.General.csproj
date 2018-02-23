@@ -59,6 +59,7 @@
     <Compile Include="HttpListenerExtensions.cs" />
     <Compile Include="HttpRemoteCallClient.cs" />
     <Compile Include="HttpRemoteCallServer.cs" />
+    <Compile Include="NetworkServices.cs" />
     <Compile Include="RemoteCallSystem.cs" />
     <Compile Include="JsonRemoteCallService.cs" />
     <Compile Include="Log4NetExtensions.cs" />
