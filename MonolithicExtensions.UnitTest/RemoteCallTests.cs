@@ -62,17 +62,23 @@ namespace PortableExtensions.UnitTest
             server.Start("http://+:45677", new Dictionary<string, object>() { { RemoteCallService, serverService } });
 
             client.Endpoint = $"http://localhost:45677/{RemoteCallService}";
-            int result = client.Call<int>(serviceType.GetMethod("AddNumbers"), new List<object>() { 5, 6 }).Result;
+            int result = client.CallAsync<int>(serviceType.GetMethod("AddNumbers"), new List<object>() { 5, 6 }).Result;
+            Assert.IsTrue(result == 11);
+            result = client.Call<int>(serviceType.GetMethod("AddNumbers"), new List<object>() { 5, 6 });
             Assert.IsTrue(result == 11);
 
-            result = (int)client.Call<long>(serviceType.GetMethod("MultiplyNumbers"), new List<object>() { 7, 8 }).Result;
+            result = (int)client.CallAsync<long>(serviceType.GetMethod("MultiplyNumbers"), new List<object>() { 7, 8 }).Result;
+            Assert.IsTrue(result == 56);
+            result = (int)client.Call<long>(serviceType.GetMethod("MultiplyNumbers"), new List<object>() { 7, 8 });
             Assert.IsTrue(result == 56);
 
-            Assert.IsTrue(client.Call<string>(serviceType.GetMethod("GetHello"), null).Result == "Hello!");
-            client.CallVoid(serviceType.GetMethod("SetHello"), new List<object>() { "doggo" }).Wait();
-            Assert.IsTrue(client.Call<string>(serviceType.GetMethod("GetHello"), null).Result == "doggo");
+            Assert.IsTrue(client.CallAsync<string>(serviceType.GetMethod("GetHello"), null).Result == "Hello!");
+            Assert.IsTrue(client.Call<string>(serviceType.GetMethod("GetHello"), null) == "Hello!");
+            client.CallVoidAsync(serviceType.GetMethod("SetHello"), new List<object>() { "doggo" }).Wait();
+            Assert.IsTrue(client.CallAsync<string>(serviceType.GetMethod("GetHello"), null).Result == "doggo");
 
-            MyAssert.ThrowsException(() => client.CallVoid(serviceType.GetMethod("ThrowException"), null).Wait());
+            MyAssert.ThrowsException(() => client.CallVoidAsync(serviceType.GetMethod("ThrowException"), null).Wait());
+            MyAssert.ThrowsException(() => client.CallVoid(serviceType.GetMethod("ThrowException"), null));
             server.Stop();
         }
     }

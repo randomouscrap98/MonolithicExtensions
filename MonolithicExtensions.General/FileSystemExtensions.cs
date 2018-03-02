@@ -73,6 +73,7 @@ namespace MonolithicExtensions.General
             TimeSpan realTimeout = (TimeSpan)timeout;
             ThreadingServices.WaitOnAction(() => File.SetAttributes(filename, FileAttributes.Normal), realTimeout);
             ThreadingServices.WaitOnAction(() => File.Delete(filename), realTimeout);
+            ThreadingServices.WaitOnAction(() => { if (File.Exists(filename)) throw new Exception("File still exists"); }, realTimeout);
         }
 
         /// <summary>

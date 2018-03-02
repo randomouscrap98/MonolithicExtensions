@@ -21,7 +21,8 @@ namespace MonolithicExtensions.General
             ContractResolver = new MyContractResolver(),
             Formatting = Formatting.None,
             ObjectCreationHandling = ObjectCreationHandling.Replace,
-            PreserveReferencesHandling = PreserveReferencesHandling.Objects
+            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+            //TypeNameHandling = TypeNameHandling.All
         };
 
         //public static void ApplyDefault

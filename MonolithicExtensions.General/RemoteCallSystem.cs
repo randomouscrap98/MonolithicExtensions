@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MonolithicExtensions.General
@@ -37,8 +38,10 @@ namespace MonolithicExtensions.General
     public interface IRemoteCallClient
     {
         string Endpoint { get; set; }
-        Task CallVoid(MethodBase method, IEnumerable<object> parameters);
-        Task<T> Call<T>(MethodBase method, IEnumerable<object> parameters);
+        void CallVoid(MethodBase method, IEnumerable<object> parameters, CancellationToken? token = null);
+        T Call<T>(MethodBase method, IEnumerable<object> parameters, CancellationToken? token = null);
+        Task CallVoidAsync(MethodBase method, IEnumerable<object> parameters, CancellationToken? token = null);
+        Task<T> CallAsync<T>(MethodBase method, IEnumerable<object> parameters, CancellationToken? token = null);
     }
 
     public interface IRemoteCallServer
@@ -61,9 +64,9 @@ namespace MonolithicExtensions.General
         public RemoteCallCommunicationException(string Message, Exception InnerException) : base(Message, InnerException) { }
     }
 
-    public class RemoteCallEndpointException : RemoteCallException
+    public class RemoteCallInternalServerException : RemoteCallException
     {
-        public RemoteCallEndpointException(string Message) : base(Message) { }
-        public RemoteCallEndpointException(string Message, Exception InnerException) : base(Message, InnerException) { }
+        public RemoteCallInternalServerException(string Message) : base(Message) { }
+        public RemoteCallInternalServerException(string Message, Exception InnerException) : base(Message, InnerException) { }
     }
 }

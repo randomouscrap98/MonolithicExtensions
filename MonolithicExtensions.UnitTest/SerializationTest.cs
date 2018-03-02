@@ -81,6 +81,25 @@ namespace MonolithicExtensions.UnitTest
             Assert.IsTrue(transporter.GetObject().Equals(SimpleClass));
         }
 
+        private class Whatever
+        {
+            public Guid ID = Guid.NewGuid();
+            public int Count = 0;
+            public string Yeah = "Yeah";
+        }
+
+        [TestMethod]
+        public void SerializeWithMissingData()
+        {
+            Whatever result = null;
+            result = MySerialize.JsonParse<Whatever>(@"{""ID"":""9a5e2128-f535-45c2-9d03-e8a8137633f4""}");
+            Assert.IsTrue(result.ID == new Guid("9a5e2128-f535-45c2-9d03-e8a8137633f4"));
+            Assert.IsTrue(result.Yeah == "Yeah");
+            result = MySerialize.JsonParse<Whatever>(@"{""Count"":66}");
+            Assert.IsFalse(result.ID == new Guid("9a5e2128-f535-45c2-9d03-e8a8137633f4"));
+            Assert.IsTrue(result.Count == 66);
+        }
+
     }
 
     //=======================================================
