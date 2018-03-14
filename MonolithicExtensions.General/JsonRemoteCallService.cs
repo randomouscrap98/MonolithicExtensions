@@ -68,7 +68,7 @@ namespace MonolithicExtensions.General
 
             result = method.Invoke(service, paramValues.ToArray());
 
-            if (result == null)
+            if (method.ReturnType == typeof(void)) //(result == null)
                 return null;
             else
                 return SerializeObject(result);

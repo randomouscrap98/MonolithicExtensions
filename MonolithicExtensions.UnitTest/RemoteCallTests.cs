@@ -77,6 +77,11 @@ namespace PortableExtensions.UnitTest
             client.CallVoidAsync(serviceType.GetMethod("SetHello"), new List<object>() { "doggo" }).Wait();
             Assert.IsTrue(client.CallAsync<string>(serviceType.GetMethod("GetHello"), null).Result == "doggo");
 
+            client.CallVoidAsync(serviceType.GetMethod("SetHello"), new List<object>() { null }).Wait();
+            Assert.IsTrue(client.CallAsync<string>(serviceType.GetMethod("GetHello"), null).Result == null);
+            client.CallVoidAsync(serviceType.GetMethod("SetHello"), new List<object>() { "newstring" }).Wait();
+            Assert.IsTrue(client.CallAsync<string>(serviceType.GetMethod("GetHello"), null).Result == "newstring");
+
             MyAssert.ThrowsException(() => client.CallVoidAsync(serviceType.GetMethod("ThrowException"), null).Wait());
             MyAssert.ThrowsException(() => client.CallVoid(serviceType.GetMethod("ThrowException"), null));
             server.Stop();

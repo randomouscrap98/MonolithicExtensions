@@ -15,6 +15,11 @@ namespace MonolithicExtensions.General
     {
         //public string BaseAddress = ""; //MUST be set by caller!
         public TimeSpan ShutdownTimeout = TimeSpan.FromSeconds(10);
+
+        /// <summary>
+        /// Produce logging information per-request. Note: this could create a HIGH volume of log messages!
+        /// </summary>
+        public bool LowLevelLogging = true;
     }
 
     public class HttpRemoteCallServer : IRemoteCallServer
@@ -125,7 +130,8 @@ namespace MonolithicExtensions.General
         /// <param name="token"></param>
         private void HandleRequest(HttpListenerContext context, CancellationToken token)
         {
-            Logger.Trace($"$Processing request from client: {context.Request.RemoteEndPoint}");
+            if(config.LowLevelLogging)
+                Logger.Trace($"$Processing request from client: {context.Request.RemoteEndPoint}");
 
             try
             {
@@ -138,14 +144,16 @@ namespace MonolithicExtensions.General
                     {
                         if (request.Url.AbsolutePath.Trim("/".ToCharArray()).EndsWith(service.Key.Trim("/".ToCharArray())))
                         {
-                            Logger.Debug($"Matched url {request.Url} to service {service.Key}");
+                            if(config.LowLevelLogging)
+                                Logger.Trace($"Matched url {request.Url} to service {service.Key}");
 
                             var input = new StreamReader(request.InputStream, request.ContentEncoding).ReadToEnd();
                             var result = remoteService.ResolveCall(input, service.Value);
 
                             if (result == null)
                             {
-                                Logger.Debug("The resolved call most likely returned void. Writing an empty string...");
+                                if(config.LowLevelLogging)
+                                    Logger.Trace("The resolved call most likely returned void. Writing an empty string...");
                                 response.WriteEmptyResponse();
                             }
                             else
