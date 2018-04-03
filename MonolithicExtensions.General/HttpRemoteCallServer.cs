@@ -11,15 +11,15 @@ using System.IO;
 
 namespace MonolithicExtensions.General
 {
-    public class HttpRemoteCallServerConfig
+    public class HttpRemoteCallServerConfig //: GeneralRemoteCallConfig
     {
         //public string BaseAddress = ""; //MUST be set by caller!
         public TimeSpan ShutdownTimeout = TimeSpan.FromSeconds(10);
 
-        /// <summary>
-        /// Produce logging information per-request. Note: this could create a HIGH volume of log messages!
-        /// </summary>
-        public bool LowLevelLogging = true;
+        ///// <summary>
+        ///// Produce logging information per-request. Note: this could create a HIGH volume of log messages!
+        ///// </summary>
+        //public bool LowLevelLogging = true;
     }
 
     public class HttpRemoteCallServer : IRemoteCallServer
@@ -29,6 +29,7 @@ namespace MonolithicExtensions.General
 
         protected ILogger Logger;
         protected HttpRemoteCallServerConfig config;
+        protected GeneralRemoteCallConfig generalConfig;
         protected HttpListener listener = null;
         protected IRemoteCallService remoteService;
         protected Dictionary<string, object> availableServices;
@@ -45,10 +46,11 @@ namespace MonolithicExtensions.General
         //    set { }
         //}
 
-        public HttpRemoteCallServer(IRemoteCallService remoteService, HttpRemoteCallServerConfig config)
+        public HttpRemoteCallServer(IRemoteCallService remoteService, HttpRemoteCallServerConfig config, GeneralRemoteCallConfig generalConfig)
         {
             Logger = LogServices.CreateLoggerFromDefault(GetType());
             this.config = config;
+            this.generalConfig = generalConfig;
             this.remoteService = remoteService;
         }
 
@@ -95,7 +97,8 @@ namespace MonolithicExtensions.General
                 {
                     var context = listener.GetContext();
 
-                    Logger.Trace($"$Received request from client: {context.Request.RemoteEndPoint}");
+                    if(generalConfig.LowLevelLogging)
+                        Logger.Trace($"$Received request from client: {context.Request.RemoteEndPoint}");
 
                     lock(currentTaskLock)
                     {
@@ -130,7 +133,7 @@ namespace MonolithicExtensions.General
         /// <param name="token"></param>
         private void HandleRequest(HttpListenerContext context, CancellationToken token)
         {
-            if(config.LowLevelLogging)
+            if(generalConfig.LowLevelLogging)
                 Logger.Trace($"$Processing request from client: {context.Request.RemoteEndPoint}");
 
             try
@@ -144,7 +147,7 @@ namespace MonolithicExtensions.General
                     {
                         if (request.Url.AbsolutePath.Trim("/".ToCharArray()).EndsWith(service.Key.Trim("/".ToCharArray())))
                         {
-                            if(config.LowLevelLogging)
+                            if(generalConfig.LowLevelLogging)
                                 Logger.Trace($"Matched url {request.Url} to service {service.Key}");
 
                             var input = new StreamReader(request.InputStream, request.ContentEncoding).ReadToEnd();
@@ -152,7 +155,7 @@ namespace MonolithicExtensions.General
 
                             if (result == null)
                             {
-                                if(config.LowLevelLogging)
+                                if(generalConfig.LowLevelLogging)
                                     Logger.Trace("The resolved call most likely returned void. Writing an empty string...");
                                 response.WriteEmptyResponse();
                             }

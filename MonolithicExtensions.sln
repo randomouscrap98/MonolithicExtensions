@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonolithicExtensions.Portable", "MonolithicExtensions.Portable\MonolithicExtensions.Portable.csproj", "{35A3FD71-3A59-467A-A1A0-60EF125A4A99}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonolithicExtensions.TestService", "MonolithicExtensions.TestService\MonolithicExtensions.TestService.csproj", "{716DA0F3-3DB9-4B10-84B4-971EBE2CDC82}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonolithicExtensions.Android", "MonolithicExtensions.Android\MonolithicExtensions.Android.csproj", "{3CB4A691-A91E-4954-A9AE-E77185FC371E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionsAndroidManualTest", "ExtensionsAndroidManualTest\ExtensionsAndroidManualTest.csproj", "{8FE5191C-8E30-4CD6-81C1-769BCC85C1D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,12 @@ Global
 		{3CB4A691-A91E-4954-A9AE-E77185FC371E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CB4A691-A91E-4954-A9AE-E77185FC371E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CB4A691-A91E-4954-A9AE-E77185FC371E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FE5191C-8E30-4CD6-81C1-769BCC85C1D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FE5191C-8E30-4CD6-81C1-769BCC85C1D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FE5191C-8E30-4CD6-81C1-769BCC85C1D3}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8FE5191C-8E30-4CD6-81C1-769BCC85C1D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FE5191C-8E30-4CD6-81C1-769BCC85C1D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FE5191C-8E30-4CD6-81C1-769BCC85C1D3}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

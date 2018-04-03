@@ -16,6 +16,16 @@ namespace PortableExtensions.UnitTest
 
         public const string RemoteCallService = "unittestremotecall";
 
+        public GeneralRemoteCallConfig CreateGeneralConfig()
+        {
+            return new GeneralRemoteCallConfig() { LowLevelLogging = true };
+        }
+
+        public JsonRemoteCallService CreateJsonService()
+        {
+            return new JsonRemoteCallService(CreateGeneralConfig());
+        }
+
         [TestMethod]
         public void TestBasicJsonRemoteCall()
         {
@@ -23,7 +33,7 @@ namespace PortableExtensions.UnitTest
 
             var service = new SimpleService();
             var serviceType = service.GetType();
-            var remote = new JsonRemoteCallService();
+            var remote = CreateJsonService();
 
             string call = remote.CreateCall(serviceType.GetMethod("AddNumbers"), new List<object> { 5, 7 });
             var result = remote.ResolveCall(call, service);
@@ -56,8 +66,8 @@ namespace PortableExtensions.UnitTest
             var serverService = new SimpleService();
             var serviceType = typeof(SimpleService);
 
-            var server = new HttpRemoteCallServer(new JsonRemoteCallService(), new HttpRemoteCallServerConfig());//serverConfig);
-            var client = new HttpRemoteCallClient(new JsonRemoteCallService(), new HttpRemoteCallClientConfig());
+            var server = new HttpRemoteCallServer(CreateJsonService(), new HttpRemoteCallServerConfig(), CreateGeneralConfig());//serverConfig);
+            var client = new HttpRemoteCallClient(CreateJsonService(), new HttpRemoteCallClientConfig());
 
             server.Start("http://+:45677", new Dictionary<string, object>() { { RemoteCallService, serverService } });
 

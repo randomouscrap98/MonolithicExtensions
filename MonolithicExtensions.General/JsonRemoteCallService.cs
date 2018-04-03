@@ -12,10 +12,12 @@ namespace MonolithicExtensions.General
     public class JsonRemoteCallService : IRemoteCallService
     {
         protected ILogger Logger;
+        private GeneralRemoteCallConfig config;
 
-        public JsonRemoteCallService()
+        public JsonRemoteCallService(GeneralRemoteCallConfig config)
         {
             Logger = LogServices.CreateLoggerFromDefault(GetType());
+            this.config = config;
         }
 
         private object DeserializeGeneral(string objectToDeserialize, Type t)
@@ -35,7 +37,8 @@ namespace MonolithicExtensions.General
 
         public string ResolveCall<T>(string request, T service)
         {
-            Logger.Trace($"Resolving call for service {service.GetType()}, request: {request}");
+            if(config.LowLevelLogging)
+                Logger.Trace($"Resolving call for service {service.GetType()}, request: {request}");
 
             Type serviceType = service.GetType();
             var call = DeserializeObject<JsonRemoteCall>(request);
@@ -48,7 +51,8 @@ namespace MonolithicExtensions.General
                 throw new InvalidOperationException("No matching method in service!");
             }
 
-            Logger.Debug($"Matched request to method {method.Name}");
+            if(config.LowLevelLogging)
+                Logger.Debug($"Matched request to method {method.Name}");
 
             var paramValues = new List<object>();
             var parameters = call.Parameters.ToDictionary(x => x.Key.ToLower(), y => y.Value);

@@ -69,4 +69,10 @@ namespace MonolithicExtensions.General
         public RemoteCallInternalServerException(string Message) : base(Message) { }
         public RemoteCallInternalServerException(string Message, Exception InnerException) : base(Message, InnerException) { }
     }
+
+    public class GeneralRemoteCallConfig
+    {
+        public bool LowLevelLogging = false;
+        //public TimeSpan 
+    }
 }
