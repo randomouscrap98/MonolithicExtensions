@@ -11,8 +11,14 @@ using static MonolithicExtensions.Windows.RestartManager;
 
 namespace MonolithicExtensions.Windows
 {
+    /// <summary>
+    /// Windows comes with a Restart Manager system used to attempt to update critical services and programs without requiring a machine reboot. This 
+    /// provides wrappers for the common functionality so you don't have to do pinvoke 
+    /// </summary>
     public static class RestartManager
     {
+        //Most of the following stuff is simply for the pinvoke nonsense. You don't need to worry about this
+
         [StructLayout(LayoutKind.Sequential)]
         public struct RM_UNIQUE_PROCESS
         {
@@ -186,12 +192,12 @@ namespace MonolithicExtensions.Windows
                     {
                         rgAffectedApps = new List<RM_PROCESS_INFO>(rawAffectedApps.Take(Convert.ToInt32(affectedApps)));
                     }
-                    break; // TODO: might not be correct. Was : Exit Do
+                    break;
                 }
                 else
                 {
                     //Oof, something we don't recognize? It's probably an error; just exit so the user knows the results.
-                    break; // TODO: might not be correct. Was : Exit Do
+                    break;
                 }
 
                 attempts += 1;
@@ -222,11 +228,9 @@ namespace MonolithicExtensions.Windows
         {
             List<Process> processes = new List<Process>();
 
-            // Enumerate all of the results And add them to the 
-            // list to be returned
+            // Enumerate all of the results And add them to the list to be returned
             foreach (var processInfo in rmProcessInfos)
             {
-                //processInfo = processInfo_loopVariable;
                 try
                 {
                     processes.Add(Process.GetProcessById(processInfo.Process.dwProcessId));
@@ -268,87 +272,13 @@ namespace MonolithicExtensions.Windows
 
             //All this crap can throw an exception. Let's hope the caller handles these exceptions at some point.
             restartSession.StartSession();
-            //ThreadingServices.WaitOnAction(
-            //    Sub()
-            //        If restartSession.SessionHandle = 0 Then Throw New Exception("Waiting for session handle to become valid")
-            //    End Sub, TimeSpan.FromSeconds(5))
 
-            //Sub() restartSession.RegisterResources(paths), TimeSpan.FromSeconds(5))
             restartSession.RegisterResources(paths);
             var rmProcesses = restartSession.GetList(ref rebootReasons);
             var realProcesses = RmProcessToNetProcess(rmProcesses);
             restartSession.EndSession();
 
             return realProcesses;
-
-            #region "OldMethod"
-            //Adapted from http://stackoverflow.com/questions/317071/how-do-i-find-out-which-process-is-locking-a-file-using-net
-            //Also adapted from https://mdetras.com/category/vb-net/
-            // http//msdn.microsoft.com/en-us/library/windows/desktop/aa373661(v=vs.85).aspx
-            // http://wyupdate.googlecode.com/svn-history/r401/trunk/frmFilesInUse.cs (no copyright in code at time of viewing)
-
-            //Dim handle As UInteger
-            //Dim key As String = Guid.NewGuid().ToString()
-            //Dim processes As New List(Of Process)
-
-            //Dim result As Integer = RmStartSession(handle, 0, key)
-
-            //If (result <> 0) Then Throw New Exception("Could not begin restart session.  Unable to determine file locker.")
-
-            //Try
-
-            //    Dim pnProcInfoNeeded As UInteger = 0,
-            //    pnProcInfo As UInteger = 0,
-            //    lpdwRebootReasons As UInteger = RmRebootReasonNone
-
-            //    Dim resources = New String() {path}   ' Just checking On one resource.
-
-            //    result = RmRegisterResources(handle, CType(resources.Length, UInteger), resources, 0, Nothing, 0, Nothing)
-            //    If (result <> 0) Then Throw New Exception("Could not register resource.")
-
-            //    'Note there's a race condition here -- the first call to RmGetList() returns
-            //    'the total number of process. However, when we call RmGetList() again to get
-            //    'the actual processes this number may have increased.
-            //    result = RmGetList(handle, pnProcInfoNeeded, pnProcInfo, Nothing, lpdwRebootReasons)
-
-            //    If (result = ERROR_MORE_DATA) Then
-
-            //        ' Create an array to store the process results
-            //        Dim processInfo As RM_PROCESS_INFO() = New RM_PROCESS_INFO(CType(pnProcInfoNeeded, Integer)) {}
-            //        pnProcInfo = pnProcInfoNeeded
-
-            //        ' Get the list
-            //        result = RmGetList(handle, pnProcInfoNeeded, pnProcInfo, processInfo, lpdwRebootReasons)
-
-            //        If (result = 0) Then
-
-            //            processes = New List(Of Process)(CType(pnProcInfo, Integer))
-
-            //            ' Enumerate all of the results And add them to the 
-            //            ' list to be returned
-            //            For i = 0 To pnProcInfo - 1
-            //                Try
-            //                    processes.Add(Process.GetProcessById(processInfo(CType(i, Integer)).Process.dwProcessId))
-            //                Catch Ex As ArgumentException
-            //                    ' catch the error -- in case the process Is no longer running
-            //                End Try
-            //            Next
-
-            //        Else
-            //            Throw New Exception("Could not list processes locking resource.")
-            //        End If
-
-            //    ElseIf (result <> 0) Then
-            //        Throw New Exception("Could not list processes locking resource. Failed to get size of result.")
-            //    End If
-
-            //Finally
-            //    RmEndSession(handle)
-            //End Try
-
-            //Return processes
-            #endregion
-
         }
 
     }
@@ -380,7 +310,7 @@ namespace MonolithicExtensions.Windows
         private bool Started { get; set; } = false;
         protected Portable.Logging.ILogger Logger { get; }
 
-        public uint SessionHandle = 0; // { get; set; }
+        public uint SessionHandle = 0; 
         public Guid SessionKey { get; } = Guid.NewGuid();
 
         public RestartManagerSession()

@@ -132,7 +132,7 @@ namespace MonolithicExtensions.UnitTest
             LogStart("TestProcessCancel");
 
             var source = new CancellationTokenSource();
-            var task = ProcessServices.RunProcess("pause.bat", "", source.Token);//.Wait(TimeSpan.FromSeconds(1));
+            var task = ProcessServices.RunProcess("pause.bat", "", source.Token);
             source.Cancel();
 
             try
@@ -144,9 +144,6 @@ namespace MonolithicExtensions.UnitTest
             {
                 Logger.Info($"Got (expected?) exception from process cancel: {ex}");
             }
-
-            //MyAssert.ThrowsException(() => task.Wait());
-            //task.Wait(TimeSpan.FromSeconds(1));
         }
     }
 

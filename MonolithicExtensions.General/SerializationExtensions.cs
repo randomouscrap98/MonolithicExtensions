@@ -13,6 +13,10 @@ using System.Threading.Tasks;
 
 namespace MonolithicExtensions.General
 {
+    /// <summary>
+    /// An attempt to create a wrapper for Newtonsoft's JSON serialization which can serialize/deserialize any object 
+    /// regardless of structure or properties. It mostly works.
+    /// </summary>
     public static class MySerialize
     {
         //This JSON serialization thing requires global settings.... great. These are the settings.
@@ -22,10 +26,7 @@ namespace MonolithicExtensions.General
             Formatting = Formatting.None,
             ObjectCreationHandling = ObjectCreationHandling.Replace,
             PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-            //TypeNameHandling = TypeNameHandling.All
         };
-
-        //public static void ApplyDefault
 
         /// <summary>
         /// Save the given object to the given TextWriter stream. This is the lowest level way to save an object; you probably
@@ -75,10 +76,7 @@ namespace MonolithicExtensions.General
         /// <returns></returns>
         public static T JsonParseFromStream<T>(ref TextReader stream)
         {
-            //T newObject = default(T);
-            //newObject = (T)serializer.Deserialize(stream, typeof(T));
             return (T)JsonParseFromStream(ref stream, typeof(T));
-            //return newObject;
         }
 
         /// <summary>
@@ -103,10 +101,6 @@ namespace MonolithicExtensions.General
         public static T JsonParse<T>(string jsonString)
         {
             return (T)JsonParse(jsonString, typeof(T));
-            //TextReader stream = new StringReader(jsonString);
-            //T result = JsonParseFromStream<T>(ref stream);
-            //stream.Dispose();
-            //return result; 
         }
 
         /// <summary>
@@ -168,80 +162,8 @@ namespace MonolithicExtensions.General
                 return contract;
             }
 
-            #region "GarbageAttempts"
-            //Protected Overrides Function CreateProperty(member As MemberInfo, memberSerialization As MemberSerialization) As JsonProperty
-
-            //    Dim prop = MyBase.CreateProperty(member, memberSerialization)
-            //    prop.Writable = ShouldSerialize(member, True) 'CanSetMemberValue(member, True)
-            //    prop.Readable = ShouldSerialize(member, True) 'CanReadMemberValue(member, True)
-            //    prop.Ignored = Not ShouldSerialize(member, True)
-            //    Return prop
-
-            //End Function
-
-            //Private Function ShouldSerialize(Member As MemberInfo, NonPublic As Boolean) As Boolean
-
-            //    'Return True
-            //    Select Case (Member.MemberType)
-            //        Case MemberTypes.Field 'ALL fields should be serialized.
-            //            Return True
-            //            'Dim fInfo = CType(Member, FieldInfo)
-            //            'Return NonPublic Or fInfo.IsPublic
-            //        Case MemberTypes.Property
-            //            Dim pInfo = CType(Member, PropertyInfo)
-            //            Return pInfo.GetMethod = Nothing OrElse pInfo.SetMethod <> Nothing
-            //            'If Not PropertyInfo.CanWrite Then Return False
-            //            'If NonPublic Then Return True
-            //            'Return PropertyInfo.GetSetMethod(NonPublic) <> Nothing
-            //        Case Else
-            //            Return False
-            //    End Select
-
-            //End Function
-
-            //Private Function CanSetMemberValue(Member As MemberInfo, NonPublic As Boolean) As Boolean
-
-            //    Select Case (Member.MemberType)
-            //        Case MemberTypes.Field
-            //            Dim FieldInfo = CType(Member, FieldInfo)
-            //            Return NonPublic Or FieldInfo.IsPublic
-            //        Case MemberTypes.Property
-            //            Dim PropertyInfo = CType(Member, PropertyInfo)
-            //            If Not PropertyInfo.CanWrite Then Return False
-            //            If NonPublic Then Return True
-            //            Return PropertyInfo.GetSetMethod(NonPublic) <> Nothing
-            //        Case Else
-            //            Return False
-            //    End Select
-
-            //End Function
-
-            //Protected Overrides Function CreateProperties(type As Type, memberSerialization As MemberSerialization) As IList(Of JsonProperty)
-
-            //    Dim props = MyBase.CreateProperties(type, memberSerialization)
-
-            //    'SERIALIZE EVERYTHING OMG
-            //    'For Each prop In props
-            //    '    prop.Ignored = False
-            //    '    prop.Readable = True
-            //    'Next
-
-            //    'Everything that is NOT readonly should not be ignored when serializing
-            //    'For Each prop In props.Where(Function(x) Not (x.Readable And Not x.Writable))
-            //    '    prop.Ignored = False
-            //    'Next
-
-            //    Return props
-
-            //End Function
-
-            #endregion
-
             protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
             {
-                //Dim properties = type.GetProperties(BindingFlags.Public Or BindingFlags.NonPublic Or BindingFlags.Instance).Select(
-                //   Function(p) MyBase.CreateProperty(p, memberSerialization))
-
                 Type currentType = type;
                 List<JsonProperty> fields = new List<JsonProperty>();
 
@@ -255,7 +177,6 @@ namespace MonolithicExtensions.General
                 }
 
                 var props = fields.GroupBy(x => x.PropertyName).Select(x => x.First()).ToList();
-                //properties.Union(fields).ToList()
 
                 props.ForEach(p =>
                 {

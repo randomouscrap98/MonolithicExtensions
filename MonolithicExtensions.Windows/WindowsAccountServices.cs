@@ -15,7 +15,6 @@ namespace MonolithicExtensions.Windows
     public static class WindowsAccountServices
     {
         private static Portable.Logging.ILogger Logger = Portable.Logging.LogServices.CreateLoggerFromDefault(typeof(WindowsAccountServices)); 
-        //log4net.ILog Logger { get; }
 
         #region "Win32 Constants"
 
@@ -270,7 +269,6 @@ namespace MonolithicExtensions.Windows
         {
             Logger.Trace("GetUserTokenFromProcess called with processID " + processID);
             IntPtr processHandle = OpenProcess(ProcessAccessFlags.QueryInformation, false, processID);
-            //ProcessAccessFlags.All, False, processID)
             if (processHandle == IntPtr.Zero)
             {
                 throw new InvalidOperationException("Could not get process handle for process ID " + processID);
@@ -296,7 +294,6 @@ namespace MonolithicExtensions.Windows
             var startInfo = new STARTUPINFO();
             var procInfo = new PROCESS_INFORMATION();
             IntPtr pEnv = IntPtr.Zero;
-            //Dim iResultOfCreateProcessAsUser As Integer
 
             startInfo.cb = Marshal.SizeOf(typeof(STARTUPINFO));
 

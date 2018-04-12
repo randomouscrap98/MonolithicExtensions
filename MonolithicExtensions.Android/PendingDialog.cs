@@ -14,6 +14,10 @@ using MonolithicExtensions.Portable.Logging;
 
 namespace MonolithicExtensions.Android
 {
+    /// <summary>
+    /// Create a "dialog" which can be shown later or in a different context, but the creator can still retrieve
+    /// the result. Useful for services which want to pop dialogs only when an activity is on screen.
+    /// </summary>
     public class PendingDialog
     {
         public int ID;
@@ -39,6 +43,9 @@ namespace MonolithicExtensions.Android
             Reset();
         }
         
+        /// <summary>
+        /// Fully reset the dialog and free any waiting threads
+        /// </summary>
         public void Reset()
         {
             waiting = 0;
@@ -56,6 +63,14 @@ namespace MonolithicExtensions.Android
             Cancellable = true;
         }
 
+        /// <summary>
+        /// You can set all these fields individually, or you can set them all at the same time with this function
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="message"></param>
+        /// <param name="positiveText"></param>
+        /// <param name="negativeText"></param>
+        /// <param name="cancellable"></param>
         public void QuickSetup(string title, string message, string positiveText, string negativeText, bool? cancellable = null)
         {
             this.Title = title;
@@ -65,7 +80,14 @@ namespace MonolithicExtensions.Android
             if (cancellable != null) this.Cancellable = (bool)cancellable;
         }
 
-        //Only one thing can wait for the dialog result. Erm will that be a problem? 
+        /// <summary>
+        /// Wait for the dialog to complete and get the result.
+        /// </summary>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Only one thing can wait for the dialog result. Erm will that be a problem? 
+        /// </remarks>
         public PendingDialogResult WaitForDialog(TimeSpan? timeout = null)
         {
             Logger.Trace("WaitForDialog called");
@@ -91,17 +113,28 @@ namespace MonolithicExtensions.Android
             return result;
         }
 
+        /// <summary>
+        /// Is this instance waiting for a dialog result?
+        /// </summary>
         public bool IsWaiting
         {
             get { return waiting != 0; }
         }
 
+        /// <summary>
+        /// Is this instance waiting for the dialog to be shown?
+        /// </summary>
         public bool IsPending
         {
             get { return pending != 0; }
         }
 
-        public void ShowDialog(Context context)//, Action positiveAction = null, Action negativeAction = null)
+        /// <summary>
+        /// Show the pending dialog in the given context. When the dialog is complete, it will signal 
+        /// anyone waiting on this pending dialog
+        /// </summary>
+        /// <param name="context"></param>
+        public void ShowDialog(Context context)
         {
             Logger.Trace("ShowDialog called");
             Interlocked.Exchange(ref pending, 0);

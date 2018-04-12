@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 
 namespace MonolithicExtensions.TestService
 {
+    /// <summary>
+    /// A service which spins up a WCF server to handle various tests that must be performed as the system account
+    /// </summary>
     public partial class Service1 : ServiceBase
     {
         public Service1()

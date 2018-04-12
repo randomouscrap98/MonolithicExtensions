@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace MonolithicExtensions.General
 {
+    /// <summary>
+    /// Functions to aid with threading problems that aren't as portable as others (these should work on Linux/Windows etc. but not necessarily Android) 
+    /// </summary>
     public static class ThreadingServices
     {
         /// <summary>
@@ -30,7 +33,7 @@ namespace MonolithicExtensions.General
                 WaitOnAction(PerformingAction, WaitTime);
                 return true;
             }
-            catch //(Exception ex)
+            catch
             {
                 return false;
             }
@@ -118,6 +121,12 @@ namespace MonolithicExtensions.General
             }
         }
 
+        /// <summary>
+        /// Schedule a task to be run after the given amount of time. Can be cancelled before/during run.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="runner"></param>
+        /// <param name="token"></param>
         public static void Timeout(TimeSpan time, Action<CancellationToken> runner, CancellationToken token)
         {
             var timer = new System.Timers.Timer(time.TotalMilliseconds);
@@ -151,12 +160,20 @@ namespace MonolithicExtensions.General
         }
     }
 
+    /// <summary>
+    /// Functions to facilitate dealing with or starting processes
+    /// </summary>
     public static class ProcessServices
     {
         private static ILogger Logger = LogServices.CreateLoggerFromDefault(typeof(ProcessServices));
 
         public static TimeSpan ProcessPollingInterval = TimeSpan.FromMilliseconds(100);
 
+        /// <summary>
+        /// A heuristic to determine if a process is a service or not. It's very bad and shouldn't be relied upon for anything even remotely important
+        /// </summary>
+        /// <param name="TestProcess"></param>
+        /// <returns></returns>
         public static bool MightBeService(this Process TestProcess)
         {
             TestProcess.Refresh();
@@ -170,25 +187,24 @@ namespace MonolithicExtensions.General
             public string Error = null;
         }
         
-        public static async Task<ProcessResult> RunProcess(string executable, string arguments, CancellationToken token, string workingDirectory = null)//, bool separateExecution)
+        /// <summary>
+        /// Start and run the given executable with the given arguments while capturing output/error/return value. Basically turns "running a process"
+        /// into "running a Task", which is way simpler. You can even cancel the process like you can a Task.
+        /// </summary>
+        /// <param name="executable"></param>
+        /// <param name="arguments"></param>
+        /// <param name="token"></param>
+        /// <param name="workingDirectory"></param>
+        /// <returns></returns>
+        public static async Task<ProcessResult> RunProcess(string executable, string arguments, CancellationToken token, string workingDirectory = null)
         {
             Logger.Trace($"StartProcess called for executable {executable} and arguments {arguments}");
             var info = new ProcessStartInfo(executable, arguments);
 
-            //if (separateExecution)
-            //{
-            //    Logger.Debug($"Executable {executable} will be started independently and will not be monitored");
-            //    testProcessInfo.UseShellExecute = True
-            //    testProcessInfo.RedirectStandardError = False
-            //    testProcessInfo.RedirectStandardOutput = False
-            //    testProcessInfo.CreateNoWindow = False
-            //}
-            //Else
             info.UseShellExecute = false;
             info.RedirectStandardError = true;
             info.RedirectStandardOutput = true;
             info.CreateNoWindow = true;
-            //End If
 
             var executableDirectory = System.IO.Path.GetDirectoryName(executable);
 
@@ -261,9 +277,8 @@ namespace MonolithicExtensions.General
                         //because throwing exceptions from within a task is um... not always nice to handle.
                         if(!processExited)
                         {
-                            process.Kill(); //Close();
+                            process.Kill(); 
                             throw new OperationCanceledException("Cancelled process before it was able to finish!");
-                            //throw new InvalidOperationException("Cancelled before process was able to finish!");
                         }
 
                         result.ExitCode = process.ExitCode;
@@ -288,105 +303,6 @@ namespace MonolithicExtensions.General
             }
         }
     }
-
-    ///// <summary>
-    ///// Allows jobs to be run one at a time, no matter when the job was submitted. Waits for
-    ///// jobs to be scheduled using async callbacks.
-    ///// </summary>
-    //public class AsyncJobQueue
-    //{
-
-    //    private readonly object QueueLock = new object();
-
-    //    private Queue<Tuple<Action, AutoResetEvent>> JobQueue = new Queue<Tuple<Action, AutoResetEvent>>();
-    //    //Private NextSignaler As New AutoResetEvent(True)
-
-    //    //Private Async Function WaitForToken() As Task(Of AutoResetEvent)
-
-    //    //    Dim waitSignaler As AutoResetEvent
-
-    //    //    'Retrieve the signaler WE should be using to wait on, then swap out the next signaler with
-    //    //    'our own (so the next job waits on us)
-    //    //    SyncLock SignalLock
-    //    //        mySignaler = New AutoResetEvent(False)
-    //    //        waitSignaler = NextSignaler
-    //    //        NextSignaler = mySignaler
-    //    //    End SyncLock
-
-    //    //    'Now we can safely wait for our signal.
-    //    //    Return mySignaler
-
-    //    //End Function
-
-    //    public async Task ExecuteWhenReady(Action job)
-    //    {
-    //        AutoResetEvent myEvent = new AutoResetEvent(false);
-    //        AutoResetEvent currentJobEvent = default(AutoResetEvent);
-
-    //        //Grab the next signaler and add us as the last job
-    //        lock (QueueLock)
-    //        {
-    //            if (JobQueue.Count == 0)
-    //            {
-    //                currentJobEvent = new AutoResetEvent(true);
-    //            }
-    //            else
-    //            {
-    //                currentJobEvent = JobQueue.Last().Item2;
-    //            }
-    //            JobQueue.Enqueue(Tuple.Create(job, myEvent));
-    //        }
-
-    //        //Wait for our turn
-    //        await Task.Run(() => currentJobEvent.WaitOne());
-
-    //        try
-    //        {
-    //            //Run our crap
-    //            job.Invoke();
-    //        }
-    //        finally
-    //        {
-    //            //Remove ourselves from the queue FIRST, that way if we're the only thing in the queue and a new 
-    //            //job gets added, it will either attach to our event which HASN'T been set yet, or it'll see 
-    //            //nothing in the queue and not have any wait.
-    //            lock (QueueLock)
-    //            {
-    //                dynamic dequeuedJob = JobQueue.Dequeue();
-    //                if (!object.ReferenceEquals(dequeuedJob.Item1, job))
-    //                {
-    //                    throw new InvalidOperationException("The queue had a programming failure; the dequeued job is not the same as the one that just completed!");
-    //                }
-    //            }
-
-    //            //Tell the next person in line to go.
-    //            myEvent.Set();
-    //        }
-    //    }
-
-    //    /// <summary>
-    //    /// Completely removes all jobs from the job queue, including the one running (it'll still finish though)
-    //    /// </summary>
-    //    public void ClearJobs()
-    //    {
-    //        lock (QueueLock)
-    //        {
-    //            JobQueue.Clear();
-    //        }
-    //    }
-
-    //    public List<Action> CurrentJobs
-    //    {
-    //        get
-    //        {
-    //            lock (QueueLock)
-    //            {
-    //                return JobQueue.Select(x => x.Item1).ToList();
-    //            }
-    //        }
-    //    }
-
-    //}
 
     //=======================================================
     //Service provided by Telerik (www.telerik.com)

@@ -10,8 +10,14 @@ using System.Runtime.InteropServices;
 
 namespace MonolithicExtensions.General
 {
+    /// <summary>
+    /// Functions for working with files
+    /// </summary>
     public static class FileServices
     {
+        /// <summary>
+        /// Settings for splitting a file (passed to the function SplitDelimitedFileByLines)
+        /// </summary>
         public class SplitFileSettings
         {
             public char[] Delimiters { get; set; } = "\t".ToCharArray();
@@ -21,6 +27,13 @@ namespace MonolithicExtensions.General
             public TimeSpan FileReadTimeout { get; set; } = TimeSpan.FromSeconds(5);
         }
 
+        /// <summary>
+        /// Most files are organized as a table where lines are rows and columns are separated by a delimiter. This allows 
+        /// easy processing of such files, along with line trimming, removing empty lines, etc.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="settings"></param>
+        /// <returns>Outer list is the rows, inner lists are the columns</returns>
         public static List<List<string>> SplitDelimitedFileByLines(string filePath, SplitFileSettings settings)
         {
             List<string> lines = new List<string>();
@@ -40,13 +53,16 @@ namespace MonolithicExtensions.General
             return results;
         }
 
+        /// <summary>
+        /// Get the file version of a dll currently loaded in the project (accepts partial dll names; returns first match)
+        /// </summary>
+        /// <param name="dllName"></param>
+        /// <returns></returns>
         public static Version GetFileVersionOfDll(string dllName)
         {
-            //Process.GetCurrentProcess().Modules
             foreach (System.Reflection.Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 var assemblyPath = assembly.Location;
-                //ProcessModule.FileName
                 if (Path.GetFileName(assemblyPath).ToUpper().Contains(dllName.ToUpper()))
                 {
                     return new Version(FileVersionInfo.GetVersionInfo(assemblyPath).FileVersion);
@@ -55,6 +71,10 @@ namespace MonolithicExtensions.General
             throw new InvalidOperationException("There is no DLL that contains the name " + dllName);
         }
 
+        /// <summary>
+        /// Get the file version of the current process main executable
+        /// </summary>
+        /// <returns></returns>
         public static Version GetOwnFileVersion()
         {
             return new Version(FileVersionInfo.GetVersionInfo(Process.GetCurrentProcess().MainModule.FileName).FileVersion);
@@ -94,14 +114,31 @@ namespace MonolithicExtensions.General
         }
     }
 
+    /// <summary>
+    /// Functions for working with directories
+    /// </summary>
+    /// <remarks>
+    /// Naming is poor; we have FileServices but DirectoryExtensions. I made a mistake and now it's stuck; if you wish
+    /// to refactor it, make sure you fix anything that references this dll.
+    /// </remarks>
     public static class DirectoryExtensions
     {
+        /// <summary>
+        /// Get the actual directory (not working directory) containing the executable used to start this process.
+        /// </summary>
+        /// <returns></returns>
         public static string GetCurrentExecutableDirectory()
         {
             var codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
             return Path.GetDirectoryName(Uri.UnescapeDataString((new Uri(codeBase)).AbsolutePath));
         }
 
+        /// <summary>
+        /// Produce an absolute (rooted) path based on the given relative filepath. If the filepath is already
+        /// absolute, nothing is changed and no error is thrown.
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
         public static string GetAbsolutePathBasedOnExecutableDirectory(string filepath)
         {
             if (Path.IsPathRooted(filepath))

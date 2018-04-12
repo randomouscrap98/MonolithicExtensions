@@ -69,9 +69,7 @@ namespace MonolithicExtensions.UnitTest
             System.Threading.Thread.Sleep(10);
             var nextObject = MySerialize.LoadObject<RestartManagerExtendedSession>(TestFile);
             Assert.IsTrue(nextObject.SessionKey == testObject.SessionKey);
-            //regularObject.Equals(SimpleClass))
             Assert.IsTrue(nextObject.ManualRestartProcesses.IsEquivalentTo(testObject.ManualRestartProcesses));
-            //regularObject.Equals(SimpleClass))
         }
 
         [TestMethod()]

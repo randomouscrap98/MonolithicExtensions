@@ -13,9 +13,11 @@ namespace MonolithicExtensions.General
     public class HttpRemoteCallClientConfig
     {
         public TimeSpan CommunicationTimeout = TimeSpan.FromSeconds(10);
-        //public string Endpoint = ""; //ALWAYS must be set!
     }
 
+    /// <summary>
+    /// Implementation of IRemoteCallClient with the most common use-case in mind.
+    /// </summary>
     public class HttpRemoteCallClient : IRemoteCallClient
     {
         protected ILogger Logger;
@@ -26,6 +28,11 @@ namespace MonolithicExtensions.General
 
         public string Endpoint { get; set; }
 
+        /// <summary>
+        /// Must inject the IRemoteCallService for creating calls and the configuration for communication
+        /// </summary>
+        /// <param name="remoteService"></param>
+        /// <param name="config"></param>
         public HttpRemoteCallClient(IRemoteCallService remoteService, HttpRemoteCallClientConfig config)
         {
             Logger = LogServices.CreateLoggerFromDefault(GetType());
@@ -35,6 +42,15 @@ namespace MonolithicExtensions.General
             client.Timeout = config.CommunicationTimeout;
         }
 
+        /// <summary>
+        /// Attempt a POST, capture all POST exceptions and wrap them in our RemoteCallCommunicationException (so the caller doesn't have to know the underlying implementation
+        /// in order to handle communication errors)
+        /// </summary>
+        /// <param name="endpoint"></param>
+        /// <param name="method"></param>
+        /// <param name="parameters"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         private async Task<HttpResponseMessage> TryPostAsync(string endpoint, MethodBase method, IEnumerable<object> parameters, CancellationToken? token)
         {
             try

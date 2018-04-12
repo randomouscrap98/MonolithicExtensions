@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace MonolithicExtensions.Portable.Logging
 {
+    /// <summary>
+    /// A logger which simply hands messages off to the handlers it was provided with. The basis for all log wrappers (unless something special is required).
+    /// </summary>
     public class BasicLogger : ILogger
     {
         public IList<ILogHandler> Handlers { get; set; } = new List<ILogHandler>();
@@ -47,7 +50,7 @@ namespace MonolithicExtensions.Portable.Logging
     /// <summary>
     /// A logger that simply acts as proxy for the real logger implemented in LogServices.DefaultLogger. This
     /// way, if someone requests a logger that's a "copy" of the default logger, they get just that. Changes
-    /// to the default logger will be reflected in all copies.
+    /// to the default logger will be reflected in all copies immediately.
     /// </summary>
     public class DefaultLoggerProxy : ILogger
     {
@@ -108,7 +111,7 @@ namespace MonolithicExtensions.Portable.Logging
         /// <summary>
         /// The factory that describes how to create loggers for all objects that request one.
         /// </summary>
-        public static DIFactory LogCreator;  //= new DIFactory();
+        public static DIFactory LogCreator;
 
         /// <summary>
         /// This ensures that an unitialized service is at least still valid and doesn't crash.
@@ -141,17 +144,17 @@ namespace MonolithicExtensions.Portable.Logging
         }
 
         /// <summary>
-        /// Create a copy of the DefaultLogger which will use the same handlers and settings.
+        /// Create a copy of the DefaultLogger which will use the same handlers and settings. NOTE: This is the function all
+        /// classes should be calling to create a logger for themselves!
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
         public static ILogger CreateLoggerFromDefault(string name)
         {
-            ILogger result = new DefaultLoggerProxy(); //'LogCreator.Create<ILogger>(); 
+            ILogger result = new DefaultLoggerProxy(); 
             result.Initialize(name);
             result.Name = name;
             return result;
-            //result.Handlers = DefaultLogger.Handlers;
         }
 
         /// <summary>

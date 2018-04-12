@@ -10,6 +10,13 @@ namespace MonolithicExtensions.Portable.Logging
     /// Represents an object used for logging. There are various methods which output messages
     /// depending on the logger given.
     /// </summary>
+    /// <remarks>
+    /// This interface is meant to wrap any and all existing logging interfaces on the various systems in order to produce
+    /// a portable logging system. For instance, on windows, a common logging backend is "log4net", but Android has its own
+    /// logging system and I believe log4net either doesn't work on there or is pretty buggy. A portable class that requires logging
+    /// would instead invoke a global function which creates a copy of the "default" logger, which can be set to wrap any logging
+    /// system in the program initialization.
+    /// </remarks>
     public interface ILogger
     {
         /// <summary>

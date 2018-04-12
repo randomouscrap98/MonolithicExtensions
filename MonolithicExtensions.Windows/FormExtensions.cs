@@ -26,7 +26,7 @@ namespace MonolithicExtensions.Windows
             {
                 return Guid.Parse(GuidTextbox.Text);
             }
-            catch //(Exception ex)
+            catch 
             {
                 return default(Guid);
             }
@@ -43,7 +43,7 @@ namespace MonolithicExtensions.Windows
             {
                 return Version.Parse(GuidTextbox.Text);
             }
-            catch //(Exception ex)
+            catch
             {
                 return null;
             }
@@ -137,14 +137,12 @@ namespace MonolithicExtensions.Windows
         public static List<TreeNode> FindTreeNodesByTag<T>(this TreeView Tree, T TagValue)
         {
             return Tree.FindTreeNodes((TreeNode node) => node.Tag is T && TagValue.Equals(node.Tag));
-            //CType(node.Tag, T).Equals(TagValue))
         }
 
         //Find treenodes based on the given tag
         public static List<TreeNode> FindTreeNodesByTag<T>(this TreeNode BaseNode, T TagValue)
         {
             return BaseNode.FindTreeNodes((TreeNode node) => node.Tag is T && TagValue.Equals(node.Tag));
-            //CType(node.Tag, T).Equals(TagValue))
         }
 
         /// <summary>
@@ -286,6 +284,13 @@ namespace MonolithicExtensions.Windows
             }
         }
 
+        /// <summary>
+        /// Set the given listview to display all the items in the given list (using the given conversion function if provided)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="view"></param>
+        /// <param name="items"></param>
+        /// <param name="displayFunction"></param>
         public static void FillWithList<T>(this ListView view, IEnumerable<T> items, Func<T, string> displayFunction = null)
         {
             if (displayFunction == null)
@@ -312,18 +317,11 @@ namespace MonolithicExtensions.Windows
             view.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
-        //public static void FillWithList<T>(this ComboBox box, IEnumerable<T> items, Func<T, string> displayFunction = null)
-        //{
-        //    if (displayFunction == null)
-        //        displayFunction = x => x.ToString();
-
-        //    box.Items.Clear();
-        //    foreach(T item in items)
-        //    {
-        //        var comboboxItem = new item
-        //    }
-        //}
-
+        /// <summary>
+        /// Appending to a textbox isn't safe on other threads and whatever. This fixes that.
+        /// </summary>
+        /// <param name="textbox"></param>
+        /// <param name="message"></param>
         public static void SafeAppend(this TextBox textbox, string message)
         {
             if (textbox.InvokeRequired)

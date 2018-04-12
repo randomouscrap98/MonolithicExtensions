@@ -5,6 +5,9 @@ using MonolithicExtensions.Windows;
 
 namespace MonolithicExtensions.UnitTest
 {
+    /// <summary>
+    /// Unit tests for testing the BasicTypeExtensions functionality.
+    /// </summary>
     [TestClass]
     public class BasicTypesTest : UnitTestBase
     {
@@ -121,10 +124,9 @@ namespace MonolithicExtensions.UnitTest
             Assert.IsTrue(time.ToSimplePhrase(1) == "1.3 days");
             time = TimeSpan.FromDays(900);
             Assert.IsTrue(time.ToSimplePhrase(0) == "2 years");
-            //Assert.IsTrue(time.ToSimplePhrase(1) = "1.3 days")
 
             //Also: military time
-            string result = TimeSpan.FromHours(13).ToMilitaryTime();// == "1300");
+            string result = TimeSpan.FromHours(13).ToMilitaryTime();
             Assert.IsTrue(result == "1300");
             result = TimeSpan.FromHours(23.5).ToMilitaryTime();
             Assert.IsTrue(result == "2330");

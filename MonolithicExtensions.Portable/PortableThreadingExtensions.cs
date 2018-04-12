@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace MonolithicExtensions.Portable
 {
     /// <summary>
-    /// Allows jobs to be run one at a time, no matter when the job was submitted. Waits for
+    /// Allows jobs to be run one at a time in order, no matter when the job was submitted. Waits for
     /// jobs to be scheduled using async callbacks.
     /// </summary>
     public class AsyncJobQueue
@@ -23,6 +23,12 @@ namespace MonolithicExtensions.Portable
             Logger = Logging.LogServices.CreateLoggerFromDefault(this.GetType());
         }
 
+        /// <summary>
+        /// Runs the given Action when a spot in the queue becomes available. All jobs submitted through this function
+        /// are run strictly in order. Returns a task representing both the queue wait and the actual job.
+        /// </summary>
+        /// <param name="job"></param>
+        /// <returns></returns>
         public async Task ExecuteWhenReady(Action job)
         {
             await ExecuteWhenReady_Generic(job, false);
@@ -115,8 +121,4 @@ namespace MonolithicExtensions.Portable
         }
 
     }
-
-    //public static class ThreadingExtensions
-    //{
-    //}
 }

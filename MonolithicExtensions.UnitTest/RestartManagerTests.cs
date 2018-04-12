@@ -15,18 +15,22 @@ using MonolithicExtensions.Windows.UnitTestSpecial;
 
 namespace MonolithicExtensions.UnitTest
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// These tests require that the IDNExtensionsMonolithicTestService be installed from a specific directory.
+    /// This service is NOT required to build MonolithicExtensions; you'll just get some failed unit tests.
+    /// This is done so that we can start/stop the service and update the files for the service. As such,
+    /// in order for these tests to work, you to make sure that:
+    /// 1) IDNExtensionsMonolithicTestService is installed (it's included in this solution; it doesn't have to be running)
+    /// 2) The path to the files for the above service is set here.
+    /// </remarks>
     [TestClass()]
     public class RestartManagerTest : UnitTestBase
     {
-        //These tests require that the IDNExtensionsMonolithicTestService be installed from a specific directory.
-        //This is done so that we can start/stop the service and update the files for the service. As such,
-        //in order for these tests to work, you to make sure that:
-        //1) IDNExtensionsMonolithicTestService is installed (it's included in this solution)
-        //2) The path to the files for the above service is set here.
-
         //If multiple people need to work on this, you can extract this into something outside compilation.
         public const string ServiceDirectory = "..\\..\\..\\MonolithicExtensions.TestService\\bin\\Debug"; 
-        //"..\\..\\..\\IDN.Extensions.Monolithic.TestService\\bin\\debug";
 
         //This file must exist in both the test directory AND the service directory and be used by the service.
         public const string ReplacementFile = "log4net.dll";
@@ -147,8 +151,6 @@ namespace MonolithicExtensions.UnitTest
             //We're hoping this will fail, as the process SHOULD be holding onto this guy
             MyAssert.ThrowsException(() => File.Copy(ReplacementProcessCopy, ReplacementProcess, true));
 
-            //System.Threading.Thread.Sleep(61000)
-
             //Now startup the restart manager and lets hope the process will be restarted.
             RestartManagerSession manager = new RestartManagerSession();
             manager.StartSession();
@@ -166,9 +168,6 @@ namespace MonolithicExtensions.UnitTest
             //Now try to restart everything
             manager.Restart();
 
-            //We're hoping this will fail, as the service SHOULD be holding onto this guy again
-            //MyAssert.ThrowsException(Sub() WaitOnAction(Sub() File.Copy(ReplacementProcessCopy, ReplacementProcess, True), TimeSpan.FromSeconds(2)))
-
             manager.EndSession();
         }
 
@@ -183,8 +182,6 @@ namespace MonolithicExtensions.UnitTest
 
             //We're hoping this will fail, as the process SHOULD be holding onto this guy
             MyAssert.ThrowsException(() => File.Copy(ReplacementProcessCopy, ReplacementProcess, true));
-
-            //System.Threading.Thread.Sleep(61000)
 
             //Now startup the restart manager and lets hope the process will be restarted.
             RestartManagerExtendedSession manager = new RestartManagerExtendedSession();

@@ -57,13 +57,13 @@ namespace ExtensionsAndroidManualTest
                 }
             });
 
-            adapter.Items = new object[ItemCount];
+            //adapter.Items = new object[ItemCount];
             for(int i = 0; i < ItemCount; i++)
             {
                 if(i % ItemsPerTitle == 0)
-                    adapter.Items[i] = $"Section {i/ItemsPerTitle + 1} ☢";
+                    adapter.Items.Add($"Section {i/ItemsPerTitle + 1} ☢");
                 else
-                    adapter.Items[i] = Guid.NewGuid();
+                    adapter.Items.Add(Guid.NewGuid());
             }
 
             multiItemListView.Adapter = adapter;

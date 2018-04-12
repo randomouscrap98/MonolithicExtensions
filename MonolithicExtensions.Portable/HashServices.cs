@@ -10,6 +10,9 @@ using System.Net.NetworkInformation;
 
 namespace MonolithicExtensions.Portable
 {
+    /// <summary>
+    /// Functions for computing common hashes.
+    /// </summary>
     public static class HashServices
     {
         public static int CRCStreamBufferSize = 4096;
@@ -160,8 +163,6 @@ namespace MonolithicExtensions.Portable
             }
             return BitConverter.GetBytes(ReverseBits(~crc)).ToArray();
         }
-
-        //public static IPEndpoint 
     }
 
     //=======================================================

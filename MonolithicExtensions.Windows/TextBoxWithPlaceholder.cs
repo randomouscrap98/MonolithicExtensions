@@ -6,6 +6,9 @@ using System.Windows.Forms;
 
 namespace MonolithicExtensions.Windows
 {
+    /// <summary>
+    /// A windows form textbox that has a light placeholder text when empty 
+    /// </summary>
     public class TextBoxWithPlaceholder : System.Windows.Forms.TextBox
     {
         /// <summary>
@@ -24,7 +27,6 @@ namespace MonolithicExtensions.Windows
             PlaceholderControl.BackColor = System.Drawing.Color.Transparent;
             PlaceholderControl.Padding = new Padding(0);
             PlaceholderControl.Margin = new Padding(0);
-            //-5, 0, 0, 0)
             PlaceholderControl.Enabled = false;
             PlaceholderControl.Dock = DockStyle.Fill;
             this.Controls.Add(PlaceholderControl);

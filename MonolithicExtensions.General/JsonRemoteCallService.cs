@@ -9,11 +9,18 @@ using System.Reflection;
 
 namespace MonolithicExtensions.General
 {
+    /// <summary>
+    /// Implements RPC communication services using JSON as an object transport method.
+    /// </summary>
     public class JsonRemoteCallService : IRemoteCallService
     {
         protected ILogger Logger;
         private GeneralRemoteCallConfig config;
 
+        /// <summary>
+        /// Must inject a general configuration to enable/disable things like low level logging
+        /// </summary>
+        /// <param name="config"></param>
         public JsonRemoteCallService(GeneralRemoteCallConfig config)
         {
             Logger = LogServices.CreateLoggerFromDefault(GetType());
@@ -72,7 +79,7 @@ namespace MonolithicExtensions.General
 
             result = method.Invoke(service, paramValues.ToArray());
 
-            if (method.ReturnType == typeof(void)) //(result == null)
+            if (method.ReturnType == typeof(void))
                 return null;
             else
                 return SerializeObject(result);

@@ -11,6 +11,12 @@ using System.ServiceModel;
 
 namespace MonolithicExtensions.UnitTest
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// These tests ALSO require that the test service is installed. See "RestartManagerTests" for information on how to set this up.
+    /// </remarks>
     [TestClass()]
     public class WindowsAccountsTest : UnitTestBase
     {

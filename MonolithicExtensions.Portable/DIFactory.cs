@@ -7,9 +7,11 @@ namespace MonolithicExtensions.Portable
 {
     /// <summary>
     /// Allows you to define the methods used to create your objects.
-    /// <remark>The type mappings you supply should always be mapped by interface and return interfaces. 
-    /// Nothing in this class should know about your underlying objects.</remark>
     /// </summary>
+    /// <remark>
+    /// The type mappings you supply should always be mapped by interface and return interfaces. 
+    /// Nothing in this class should know about your underlying objects.
+    /// </remark>
     public class DIFactory
     {
         protected Logging.ILogger Logger = null;
@@ -100,6 +102,11 @@ namespace MonolithicExtensions.Portable
             SetSetting<Type>(typeof(T), value);
         }
 
+        /// <summary>
+        /// Create an object of type <paramref name="objectType"/> when the type is only known during runtime.
+        /// </summary>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
         public object Create(Type objectType)
         {
             if(Logger != null)
@@ -112,7 +119,7 @@ namespace MonolithicExtensions.Portable
         }
 
         /// <summary>
-        /// Attempt to create an interface/service/whatever of the given type
+        /// Attempt to create an interface/service/whatever of the given type when the type is known at runtime.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -147,7 +154,6 @@ namespace MonolithicExtensions.Portable
         /// Fails with InvalidOperationException if there are duplicate definitions.
         /// </summary>
         /// <param name="newFactory"></param>
-
         public void MergeWithSelf(DIFactory newFactory)
         {
             //For each container, merge the creation mappings

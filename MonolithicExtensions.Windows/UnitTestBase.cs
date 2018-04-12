@@ -13,10 +13,14 @@ using Microsoft.Win32;
 
 namespace MonolithicExtensions.Windows
 {
+    /// <summary>
+    /// Most of my unit tests require the same thing: logging, log setup, etc. They all derive from this class to inherit 
+    /// that common functionality
+    /// </summary>
     public class UnitTestBase
     {
         public ILogger Logger;
-        public readonly string TestName;// = "UnitTest";
+        public readonly string TestName;
 
         public UnitTestBase(string name = null)
         {
@@ -30,18 +34,6 @@ namespace MonolithicExtensions.Windows
             Log4NetExtensions.SetupDebugLogger($"Unit_{name}");
             Log4NetExtensions.SetLog4NetAsDefaultLogger();
             Logger = LogServices.CreateLoggerFromDefault(name);
-
-            //if (name != null)
-            //{
-            //    Logger = LogServices.CreateLoggerFromDefault(this.GetType());
-            //}
-            //else
-            //{
-            //    Log4NetExtensions.SetupDebugLogger("UnitTest");
-            //}
-
-            //if (name == null)
-            //else
         }
 
         public void LogStart(string functionName)
@@ -121,6 +113,9 @@ namespace MonolithicExtensions.Windows
         }
     }
 
+    /// <summary>
+    /// Extra assert clauses used in various unit testing
+    /// </summary>
     public static class MyAssert
     {
         /// <summary>
@@ -134,7 +129,7 @@ namespace MonolithicExtensions.Windows
             {
                 FailAction.Invoke();
             }
-            catch //(Exception ex)
+            catch
             {
                 threwException = true;
             }
@@ -226,7 +221,7 @@ namespace MonolithicExtensions.Windows
             {
                 testObject = (ComplexContainer)obj;
             }
-            catch //(Exception ex)
+            catch
             {
                 return false;
             }
@@ -252,7 +247,7 @@ namespace MonolithicExtensions.Windows
             {
                 testObject = (InheritedContainer)obj;
             }
-            catch //(Exception ex)
+            catch
             {
                 return false;
             }

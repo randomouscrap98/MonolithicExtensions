@@ -10,6 +10,10 @@ namespace MonolithicExtensions.Windows
 {
     public static class SerialPortServices
     {
+        /// <summary>
+        /// Query windows to retrieve information about all available serial ports and the devices connected to them.
+        /// </summary>
+        /// <returns></returns>
         public static List<SerialPortInfo> GetAllSerialPortInfo()
         {
             List<SerialPortInfo> results = new List<SerialPortInfo>();
@@ -48,15 +52,6 @@ namespace MonolithicExtensions.Windows
             try { Manufacturer = Convert.ToString(qo["Manufacturer"]); }
             catch { /*do nothing*/ }
         }
-
-        //Public Sub New(name As String, Optional description As String = "", Optional DeviceID As String = "",
-        //               Optional Caption As String = "", Optional Manufacturer As String = "")
-        //    Me.Name = name
-        //    Me.Description = description
-        //    Me.Caption = Caption
-        //    Me.DeviceID = DeviceID
-        //    Me.Manufacturer = Manufacturer
-        //End Sub
     }
 
     //=======================================================

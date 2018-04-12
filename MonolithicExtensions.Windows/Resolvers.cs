@@ -8,6 +8,9 @@ using System.Web.Http.Dependencies;
 
 namespace MonolithicExtensions.Windows
 {
+    /// <summary>
+    /// Wraps a DIFactory object so that it can be used as an IDependencyResolver (for .NET web dependency injection stuff)
+    /// </summary>
     public class DIResolver : DIFactory, IDependencyResolver
     {
         public IDependencyScope BeginScope()

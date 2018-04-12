@@ -7,8 +7,14 @@ using MonolithicExtensions.Portable;
 
 namespace MonolithicExtensions.General
 {
+    /// <summary>
+    /// Extension functions for working with the console
+    /// </summary>
     public static class ConsoleExtensions
     {
+        /// <summary>
+        /// Configuration used for most of the console display functions here
+        /// </summary>
         public class Configuration
         {
             public ConsoleColor OutputBG = ConsoleColor.Gray;
@@ -18,9 +24,11 @@ namespace MonolithicExtensions.General
             public ConsoleColor ClearColor = ConsoleColor.Black;
 
             public int ListDisplayCount = 15;
-            //public Action<ConsoleKeyInfo> ProcessUnusedKey = null;
         }
 
+        /// <summary>
+        /// A helper class that returns preconfigured arrays to build specific types of field requests
+        /// </summary>
         public static class FieldRequestSelections
         {
             public static List<string> Bool() { return new List<string> { "true", "false" }; }
@@ -52,6 +60,18 @@ namespace MonolithicExtensions.General
             Console.BackgroundColor = bg;
         }
 
+        //All "TopCascading<Thing> functions display a full-width block UI that grows down starting from y="top".
+        //In this manner, menus and field inputs can be displayed in a "cascading" manner: a menu at the top might open
+        //a field request immediately below. This makes it simpler(?) to create console applications.
+        //NOTE: Do NOT clear the console while using any TopCascading function that accepts user input. The 
+        //console is NOT redrawn; you will lose the visuals.
+
+        /// <summary>
+        /// Display rows of key/value pairs in a 2 column table. Waits for user input before cleaning up the used area of the console.
+        /// </summary>
+        /// <param name="top">The console Y to start drawing the fields</param>
+        /// <param name="fields">The fields to display in a 2 column table</param>
+        /// <param name="config">The console color configuration (defaults to white/black/green)</param>
         public static void TopCascadingDisplayFields(int top, Dictionary<string, string> fields, Configuration config = null)
         {
             var oldbg = Console.BackgroundColor;
@@ -84,11 +104,28 @@ namespace MonolithicExtensions.General
             QuickSet(oldfg, oldbg, oldx, oldy);
         }
 
+        /// <summary>
+        /// Request a series of string values (by name) and return a dictionary representing the retrieved values. All
+        /// fields will request a generic string input from the user.
+        /// </summary>
+        /// <param name="top">The console Y to start drawing the fields</param>
+        /// <param name="fields">The fields to request from the user</param>
+        /// <param name="config">The console color configuration (defaults to white/black/green)</param>
+        /// <returns></returns>
         public static Dictionary<string, string> TopCascadingRequestFields(int top, IList<string> fields, Configuration config = null)
         {
             return TopCascadingRequestFields(top, fields.ToDictionary(x => x, y => (IList<string>)null), config);
         }
 
+        /// <summary>
+        /// Request a series of values (by name) and return a dictionary representing the retrieved values. Fields can have
+        /// a limited set of choices (the value in the key/value pair of <paramref name="fields"/>); if it is null or empty, 
+        /// a general string input will be used instead.
+        /// </summary>
+        /// <param name="top">The console Y to start drawing the fields</param>
+        /// <param name="fields">The fields to request from the user and the available choices for each field</param>
+        /// <param name="config">The console color configuration (defaults to white/black/green)</param>
+        /// <returns></returns>
         public static Dictionary<string, string> TopCascadingRequestFields(int top, IDictionary<string, IList<string>> fields, Configuration config = null)
         {
             var oldbg = Console.BackgroundColor;
@@ -165,9 +202,11 @@ namespace MonolithicExtensions.General
         /// Draw the given list of items at the given page/count per page
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="items"></param>
-        /// <param name="count"></param>
-        /// <param name="page"></param>
+        /// <param name="top">The console Y to start drawing the list</param>
+        /// <param name="items">The objects and display names for ALL items across all pages</param>
+        /// <param name="page">The page to display (starting from 0)</param>
+        /// <param name="config">The console color configuration (defaults to white/black/green)</param>
+        /// <param name="selected">The index (on the page, not overall) to highlight</param>
         private static int DrawList<T>(int top, IList<Tuple<T, string>> items, int page, Configuration config, int selected = -1)
         {
             int pages = (int)Math.Ceiling((double)items.Count / config.ListDisplayCount);
@@ -184,7 +223,7 @@ namespace MonolithicExtensions.General
                 Console.Write($"Page {page + 1} of {pages}".PadRight(Console.WindowWidth));
             }
 
-            SetColor(config.OutputBG, config.OutputFG);//, 0, top);
+            SetColor(config.OutputBG, config.OutputFG);
 
             for (int i = 0; i < config.ListDisplayCount; i++)
             {
@@ -209,13 +248,18 @@ namespace MonolithicExtensions.General
 
         /// <summary>
         /// A menu drawn at <paramref name="top"/> units from the top of the console. Menus can be created recursively
-        /// to 'cascade' down. Menus are NOT redrawn: do not clear the console while using this menu system.
+        /// to 'cascade' down. Menus are NOT redrawn: do not clear the console while using this menu system. This menu
+        /// operates on a list of items.
         /// </summary>
-        /// <param name="top"></param>
-        /// <param name="output"></param>
-        /// <param name="options"></param>
+        /// <param name="top">The console Y to start drawing the list</param>
+        /// <param name="output">The text describing the menu (a title, basically)</param>
+        /// <param name="options">The list of options/choices for this menu and the function to run when selected. The function
+        ///                       is passed the current top, the item being operated on (if menu has a list), and is expected
+        ///                       to return whether or not this choice ends the menu operation.</param>
+        /// <param name="listItems">The list of items for the menu to operate on</param>
+        /// <param name="config">The console color configuration (defaults to white/black/green)</param>
         public static string TopCascadingListMenu<T>(int top, string output, IDictionary<string, Func<int, T, bool>> options,
-            IList<Tuple<T, string>> listItems, Configuration config = null) //where T : null //where T : default()
+            IList<Tuple<T, string>> listItems, Configuration config = null)
         {
             var oldbg = Console.BackgroundColor;
             var oldfg = Console.ForegroundColor;
@@ -285,6 +329,7 @@ namespace MonolithicExtensions.General
             var bottom = Console.CursorTop;
             string result = "";
 
+            //The menu loop. Wait for input and perform tasks attached to menu options. Quit when the menu option task returns "false"
             while (true)
             {
                 T selectedItem = hasList && listItems.Count > selected && selected >= 0 ? listItems[selected].Item1 : default(T);
@@ -311,13 +356,13 @@ namespace MonolithicExtensions.General
                     bool redrawList = true;
 
                     if (key.Key == ConsoleKey.DownArrow && selected < config.ListDisplayCount - 1)
-                        selected++;// = (selected + 1) % config.ListDisplayCount;
-                    else if (key.Key == ConsoleKey.UpArrow && selected > 0)//selected < config.ListDisplayCount - 1)
-                        selected--;// = (config.ListDisplayCount + selected - 1) % config.ListDisplayCount;
+                        selected++;
+                    else if (key.Key == ConsoleKey.UpArrow && selected > 0)
+                        selected--;
                     else if (key.Key == ConsoleKey.RightArrow && page < pages - 1)
-                        page++;// = (page + 1) % pages;
+                        page++;
                     else if (key.Key == ConsoleKey.LeftArrow && page > 0)
-                        page--;// = (pages + page - 1) % pages;
+                        page--;
                     else
                         redrawList = false;
 
@@ -337,14 +382,31 @@ namespace MonolithicExtensions.General
             return result;
         }
 
+        /// <summary>
+        /// A menu drawn at <paramref name="top"/> units from the top of the console. Menus can be created recursively
+        /// to 'cascade' down. Menus are NOT redrawn: do not clear the console while using this menu system. This is
+        /// a standalone menu
+        /// </summary>
+        /// <param name="top">The console Y to start drawing the list</param>
+        /// <param name="output">The text describing the menu (a title, basically)</param>
+        /// <param name="options">The list of options/choices for this menu and the function to run when selected. The function
+        ///                       is passed the current top and is expected to return whether or not this choice ends the menu operation.</param>
+        /// <param name="config">The console color configuration (defaults to white/black/green)</param>
         public static string TopCascadingMenu(int top, string output, IDictionary<string, Func<int, bool>> options,
-            Configuration config = null) //where T : default()
+            Configuration config = null)
         {
             return TopCascadingListMenu(top, output,
                 options.ToDictionary(x => x.Key, x => new Func<int, object, bool>((t, o) => x.Value(t))),
                 null, config);
         }
 
+        /// <summary>
+        /// A wrapper for TopCascadingMenu that performs a confirmation dialog. 
+        /// </summary>
+        /// <param name="top"></param>
+        /// <param name="output"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public static bool TopCascadingConfirm(int top, string output, Configuration config = null)
         {
             return TopCascadingMenu(top, output, new Dictionary<string, Func<int, bool>>() {
@@ -353,18 +415,17 @@ namespace MonolithicExtensions.General
             }, config) == "Yes";
         }
 
+        /// <summary>
+        /// A wrapper for TopCascadingMenu that simply displays a message that the user must acknowledge
+        /// </summary>
+        /// <param name="top"></param>
+        /// <param name="output"></param>
+        /// <param name="config"></param>
         public static void TopCascadingMessage(int top, string output, Configuration config = null)
         {
             TopCascadingMenu(top, output, new Dictionary<string, Func<int, bool>>() {
                 { "OK", (i) => true }
             }, config);
         }
-
-        //public static void TopListMenu<T>(int top, string output, Dictionary<T, string> items, int displayCount,
-        //    Dictionary<string, Func<int, T, bool>> menuOptions, MenuConfiguration config = null)
-        //{
-        //    if (config == null)
-        //        config = new MenuConfiguration();
-        //}
     }
 }

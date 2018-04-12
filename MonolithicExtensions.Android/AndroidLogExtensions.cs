@@ -7,14 +7,23 @@ using System.Text;
 
 namespace MonolithicExtensions.Android
 {
+    /// <summary>
+    /// Services for setting up logging on android devices.
+    /// </summary>
     public static class AndroidLoggerExtensions
     {
+        /// <summary>
+        /// Make all loggers created at anytime redirect to the Android logging system.
+        /// </summary>
         public static void SetAndroidAsDefaultLogger()
         {
             LogServices.Initialize(x => new AndroidLoggerWrapper(), true);
         }
     }
 
+    /// <summary>
+    /// An ILogger implementation that redirects messages to the Android Log system.
+    /// </summary>
     public class AndroidLoggerWrapper : ILogger
     {
         public IList<ILogHandler> Handlers

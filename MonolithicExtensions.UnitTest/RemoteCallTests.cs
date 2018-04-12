@@ -61,12 +61,10 @@ namespace PortableExtensions.UnitTest
         {
             LogStart("TestHttpRemoteCall");
 
-            //var clientConfig = new HttpRemoteCallClientConfig();// { Endpoint = "http://localhost:45677/" + RemoteCallService };
-            //var serverConfig = new HttpRemoteCallServerConfig();// { BaseAddress = "http://+:45677" };
             var serverService = new SimpleService();
             var serviceType = typeof(SimpleService);
 
-            var server = new HttpRemoteCallServer(CreateJsonService(), new HttpRemoteCallServerConfig(), CreateGeneralConfig());//serverConfig);
+            var server = new HttpRemoteCallServer(CreateJsonService(), new HttpRemoteCallServerConfig(), CreateGeneralConfig());
             var client = new HttpRemoteCallClient(CreateJsonService(), new HttpRemoteCallClientConfig());
 
             server.Start("http://+:45677", new Dictionary<string, object>() { { RemoteCallService, serverService } });

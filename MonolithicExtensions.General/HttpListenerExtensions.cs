@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MonolithicExtensions.General
 {
+    /// <summary>
+    /// Extension functions for HttpListener objects.
+    /// </summary>
     public static class HttpListenerExtensions
     {
         /// <summary>

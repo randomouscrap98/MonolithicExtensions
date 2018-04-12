@@ -29,26 +29,87 @@ namespace MonolithicExtensions.General
         /// </summary>
         /// <param name="serializedParameters"></param>
         /// <returns></returns>
-        string CreateCall(MethodBase info, IEnumerable<object> parameters);//Dictionary<string, object> serializedParameters);
+        string CreateCall(MethodBase info, IEnumerable<object> parameters);
 
+        /// <summary>
+        /// Serialize object into string using whatever method the implementation gives
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="objectToSerialize"></param>
+        /// <returns></returns>
         string SerializeObject<T>(T objectToSerialize);
+
+        /// <summary>
+        /// Deserialize string into object using the same method as SerializeObject
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="objectToDeserialize"></param>
+        /// <returns></returns>
         T DeserializeObject<T>(string objectToDeserialize);
     }
 
+    /// <summary>
+    /// A service for facilitating remote procedure calls between processes/networks/etc. (depending on the implementation)
+    /// </summary>
     public interface IRemoteCallClient
     {
+        /// <summary>
+        /// The endpoint of the RPC server to make calls against
+        /// </summary>
         string Endpoint { get; set; }
+        
+        /// <summary>
+        /// Call the given void function against the RPC server given in Endpoint
+        /// </summary>
+        /// <param name="method"></param>
+        /// <param name="parameters"></param>
+        /// <param name="token"></param>
         void CallVoid(MethodBase method, IEnumerable<object> parameters, CancellationToken? token = null);
+
+        /// <summary>
+        /// Call the given function against the RPC server given in Endpoint
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="method"></param>
+        /// <param name="parameters"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         T Call<T>(MethodBase method, IEnumerable<object> parameters, CancellationToken? token = null);
+
+        /// <summary>
+        /// Call the given void function against the RPC server given in Endpoint without blocking
+        /// </summary>
+        /// <param name="method"></param>
+        /// <param name="parameters"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         Task CallVoidAsync(MethodBase method, IEnumerable<object> parameters, CancellationToken? token = null);
+
+        /// <summary>
+        /// Call the given function against the RPC server given in Endpoint without blocking 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="method"></param>
+        /// <param name="parameters"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         Task<T> CallAsync<T>(MethodBase method, IEnumerable<object> parameters, CancellationToken? token = null);
     }
 
+    /// <summary>
+    /// An interface for a remote procedure call server which directs calls on an address to a given set of service objects.
+    /// </summary>
     public interface IRemoteCallServer
     {
-        //string BaseAddress { get; set; }
-        //object CallInterface { get; set; }
+        /// <summary>
+        /// Begin the remote procedure call server to listen on <paramref name="baseAddress"/>. Clients can call public functions
+        /// on the given service objects by combining the baseAddress with the service endpoint dictionary key and using 
+        /// an IRemoteCallClient to create the serialized call data.
+        /// </summary>
+        /// <param name="baseAddress"></param>
+        /// <param name="services"></param>
         void Start(string baseAddress, Dictionary<string, object> services);
+
         void Stop();
     }
 
@@ -73,6 +134,5 @@ namespace MonolithicExtensions.General
     public class GeneralRemoteCallConfig
     {
         public bool LowLevelLogging = false;
-        //public TimeSpan 
     }
 }

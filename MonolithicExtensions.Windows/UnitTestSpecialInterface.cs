@@ -1,5 +1,4 @@
-﻿
-using MonolithicExtensions.General;
+﻿using MonolithicExtensions.General;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -9,6 +8,9 @@ using System.ServiceModel;
 
 namespace MonolithicExtensions.Windows.UnitTestSpecial
 {
+    /// <summary>
+    /// The functions exposed by the test service which allow them to be performed as the system account
+    /// </summary>
     [ServiceContract()]
     public interface ISpecialTestContract
     {

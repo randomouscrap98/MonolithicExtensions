@@ -13,6 +13,11 @@ namespace MonolithicExtensions.Windows
     //Kindly given by http://stackoverflow.com/a/2611435/1066474 with a few modifications
     public static class GacUtilities
     {
+        /// <summary>
+        /// Install a DLL into the GAC
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="forceRefresh"></param>
         public static void InstallAssembly(string path, bool forceRefresh)
         {
             IAssemblyCache iac = null;
@@ -32,6 +37,10 @@ namespace MonolithicExtensions.Windows
             }
         }
 
+        /// <summary>
+        /// Remove an assembly with the given display name from the GAC
+        /// </summary>
+        /// <param name="displayName"></param>
         public static void UninstallAssembly(string displayName)
         {
             IAssemblyCache iac = null;

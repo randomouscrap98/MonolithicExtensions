@@ -11,15 +11,9 @@ using System.IO;
 
 namespace MonolithicExtensions.General
 {
-    public class HttpRemoteCallServerConfig //: GeneralRemoteCallConfig
+    public class HttpRemoteCallServerConfig 
     {
-        //public string BaseAddress = ""; //MUST be set by caller!
         public TimeSpan ShutdownTimeout = TimeSpan.FromSeconds(10);
-
-        ///// <summary>
-        ///// Produce logging information per-request. Note: this could create a HIGH volume of log messages!
-        ///// </summary>
-        //public bool LowLevelLogging = true;
     }
 
     public class HttpRemoteCallServer : IRemoteCallServer
@@ -39,13 +33,13 @@ namespace MonolithicExtensions.General
         private readonly object currentTaskLock = new object();
         private CancellationTokenSource cancelSource = null;
 
-        //public string BaseAddress { get; set; }
-        //public string BaseAddress
-        //{
-        //    get { return config.BaseAddress; }
-        //    set { }
-        //}
-
+        /// <summary>
+        /// Must inject the IRemoteCallService to resolve calls and TWO configuration objects: one for the server, and one for general
+        /// configuration of any RemoteCall service.
+        /// </summary>
+        /// <param name="remoteService"></param>
+        /// <param name="config"></param>
+        /// <param name="generalConfig"></param>
         public HttpRemoteCallServer(IRemoteCallService remoteService, HttpRemoteCallServerConfig config, GeneralRemoteCallConfig generalConfig)
         {
             Logger = LogServices.CreateLoggerFromDefault(GetType());
@@ -75,7 +69,6 @@ namespace MonolithicExtensions.General
                 listener.Prefixes.Add(endpoint);
             }
 
-            //listener.Prefixes.Add(config.UpdateServerEndpoint);
             listener.Start();
             availableServices = services;
 

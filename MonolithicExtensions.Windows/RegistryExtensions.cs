@@ -17,6 +17,11 @@ namespace MonolithicExtensions.Windows
     {
         private static log4net.ILog Logger { get; } = log4net.LogManager.GetLogger(typeof(RegistryServices));
 
+        /// <summary>
+        /// Retrieve a mapping of all COM registrations to their identifiers.
+        /// </summary>
+        /// <param name="includeUnknowns"></param>
+        /// <returns></returns>
         public static Dictionary<Guid, ComRegistryData> GetComClsidMapping(bool includeUnknowns = false)
         {
             Logger.Trace("Starting GetComClsidMapping");
@@ -36,6 +41,12 @@ namespace MonolithicExtensions.Windows
             return mapping;
         }
 
+        /// <summary>
+        /// Retrieve a mapping of all COM registrations and their associated identifiers starting at the given key.
+        /// </summary>
+        /// <param name="startKey"></param>
+        /// <param name="includeUnknowns"></param>
+        /// <returns></returns>
         private static Dictionary<Guid, ComRegistryData> GetComClsidMappingGeneric(string startKey, bool includeUnknowns = false)
         {
             var mapping = new Dictionary<Guid, ComRegistryData>();
@@ -87,13 +98,10 @@ namespace MonolithicExtensions.Windows
                     }
 
                 }
-                catch (ArgumentException ex)
-                {
-                    //Ignore argument exceptions
-                }
                 catch (Exception ex)
                 {
-                    Logger.Warn("Exception while parsing InprocServer32 registry value: " + ex.ToString());
+                    if(!(ex is ArgumentException))
+                        Logger.Warn("Exception while parsing InprocServer32 registry value: " + ex.ToString());
                 }
 
             }
@@ -155,7 +163,7 @@ namespace MonolithicExtensions.Windows
     public class RegFileValue
     {
         public object RawValue { get; set; } = null;
-        public RegFileType GivenType { get; set; } = 0;  //RegFileType.hex2;
+        public RegFileType GivenType { get; set; } = 0;
     }
 
     public enum RegFileType

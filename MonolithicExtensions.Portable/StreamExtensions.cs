@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace MonolithicExtensions.Portable
 {
+    /// <summary>
+    /// Extensions functions applied to streams.
+    /// </summary>
+    /// <remarks>
+    /// Most of these are pretty useless; they were only created to aid in the MorphoIdent API. They also have
+    /// poor performance.
+    /// </remarks>
     public static class StreamExtensions
     {
         /// <summary>

@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace MonolithicExtensions.General
 {
+    /// <summary>
+    /// Contains functions for retrieving information relating to the network.
+    /// </summary>
     public static class NetworkServices
     {
         public static int TeaserPort = 65530;
@@ -27,6 +30,10 @@ namespace MonolithicExtensions.General
             return GetUsedIp("8.8.8.8");
         }
 
+        /// <summary>
+        /// A wrapper for GetusedExternalIp for times where you just need the address without handling exceptions
+        /// </summary>
+        /// <returns></returns>
         public static string GetUsedExternalIpSimple()
         {
             try

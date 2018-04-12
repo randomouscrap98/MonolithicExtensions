@@ -22,8 +22,6 @@ namespace MonolithicExtensions.Windows
 
         public bool UseFolderDialog { get; set; } = false;
 
-        //public event Action<FilePathSelector, string> Text
-
         public override string Text
         {
             get { return PathBox.Text; }

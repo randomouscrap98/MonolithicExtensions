@@ -11,7 +11,7 @@ using MonolithicExtensions.Portable.Logging;
 namespace MonolithicExtensions.General.Logging
 {
     /// <summary>
-    /// A logger which is a wrapper for log4net. It turns the PortableExtensions logger into 
+    /// A logger which is a wrapper for log4net. It turns the MonolithicExtensions.Portable.Logging.ILogger logger into 
     /// the log4net logger (basically).
     /// </summary>
     public class Log4NetWrapper : ILogger
@@ -35,7 +35,6 @@ namespace MonolithicExtensions.General.Logging
         public void Initialize(string name)
         {
             Name = name;
-            //Logger = log4net.LogManager.GetLogger(name);
         }
 
         public log4net.Core.Level ConvertToLog4NetLevel(int level)
@@ -81,6 +80,9 @@ namespace MonolithicExtensions.General.Logging
         }
     }
 
+    /// <summary>
+    /// Contains functions for configuring the log services to use Log4net.
+    /// </summary>
     public static class Log4NetExtensions 
     {
         public static void Trace(this ILog Logger, string Message, Exception Ex = null)
@@ -171,6 +173,9 @@ namespace MonolithicExtensions.General.Logging
             log4net.Config.XmlConfigurator.Configure(DebugLoggerConfigElement);
         }
 
+        /// <summary>
+        /// Call this function to set ALL loggers to use log4net as the logging system.
+        /// </summary>
         public static void SetLog4NetAsDefaultLogger()
         {
             LogServices.Initialize(x => new Log4NetWrapper(), true);

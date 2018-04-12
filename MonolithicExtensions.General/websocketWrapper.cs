@@ -8,7 +8,13 @@ using System.Collections.Generic;
 using MonolithicExtensions.Portable;
 using MonolithicExtensions.Portable.Logging;
 
-namespace MonolithicExtensions.General //?
+/// <summary>
+/// Extension functions for .NET's builtin websocket objects.
+/// </summary>
+/// <remarks>
+/// I don't believe anything actually uses these websocket extensions. You can probably safely remove these... probably.
+/// </remarks>
+namespace MonolithicExtensions.General 
 {
    public static class ClientWebSocketExtensions 
    {
@@ -18,9 +24,20 @@ namespace MonolithicExtensions.General //?
 
       private static ILogger Logger = LogServices.CreateLoggerFromDefault(typeof(ClientWebSocketExtensions));
 
-      //That cancellation token is gross because... optional parameters and whatever
-      public static async Task SendMessageAsync(this ClientWebSocket client, string message, 
-            CancellationToken? token = null)
+      // .NET's websocket client is kind of lacking. SendMessageAsync, combined with ReadMessageAsync,
+      // enable easy message-based communication over a websocket client.
+
+      /// <summary>
+      /// Send a block of data (given as a string) over the given ClientWebSocket.
+      /// </summary>
+      /// <param name="client"></param>
+      /// <param name="message"></param>
+      /// <param name="token"></param>
+      /// <returns></returns>
+      /// <remarks>
+      /// That cancellation token is gross because... optional parameters and whatever
+      /// </remarks>
+      public static async Task SendMessageAsync(this ClientWebSocket client, string message, CancellationToken? token = null)
       {
          Logger.Trace($"SendMessageAsync called with message of size {message.Length}");
 
@@ -47,8 +64,13 @@ namespace MonolithicExtensions.General //?
          }
       }
 
-      public static async Task<string> ReadMessageAsync(this ClientWebSocket client, 
-            CancellationToken? token = null)
+      /// <summary>
+      /// Read a block of data from the ClientWebSocket and return it as a string.
+      /// </summary>
+      /// <param name="client"></param>
+      /// <param name="token"></param>
+      /// <returns></returns>
+      public static async Task<string> ReadMessageAsync(this ClientWebSocket client, CancellationToken? token = null)
       {
          Logger.Trace($"ReadMessageAsync called");
 

@@ -1,35 +1,17 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-//using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 
+//These are all extensions for what I consider "basic types". Stuff like integers, strings, bytes, etc. Not all of it makes sense; I'm sorry.
+//If you dislike attaching extensions to types, you can repurpose this into a service model.
 namespace MonolithicExtensions.Portable
 {
-    public static class TypeExtensions
-    {
-        //public static string GetRealTypeName(this Type t)
-        //{
-        //    if (!t.IsGenericType)
-        //        return t.Name;
-
-        //    StringBuilder sb = new StringBuilder();
-        //    sb.Append(t.Name.Substring(0, t.Name.IndexOf('`')));
-        //    sb.Append('<');
-        //    bool appendComma = false;
-        //    foreach (Type arg in t.GetGenericArguments())
-        //    {
-        //        if (appendComma) sb.Append(',');
-        //        sb.Append(GetRealTypeName(arg));
-        //        appendComma = true;
-        //    }
-        //    sb.Append('>');
-        //    return sb.ToString();
-        //}
-    }
-
+    /// <summary>
+    /// Extension functions applied to integers. For instance, it allows you to do 10.ToGuid()
+    /// </summary>
     public static class IntegerExtensions
     {
         /// <summary>
@@ -45,10 +27,15 @@ namespace MonolithicExtensions.Portable
         }
     }
 
+    /// <summary>
+    /// Extension functions applied to bytes and byte arrays.
+    /// </summary>
     public static class ByteExtensions
     {
         private const byte One = 1;
 
+        //Although this table is not used in ByteExtensions, it may still be useful to the outside world, so I kept it in here.
+        //If you know nobody will need it, you can remove it safely.
         #region Unnecessary
         public static byte[] BitReverseTable = new byte[] {
         0x0, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0,
@@ -126,6 +113,9 @@ namespace MonolithicExtensions.Portable
         }
     }
 
+    /// <summary>
+    /// Extension functions applied to strings.
+    /// </summary>
     public static class StringExtensions
     {
         /// <summary>
@@ -179,6 +169,15 @@ namespace MonolithicExtensions.Portable
             throw new InvalidOperationException("Could Not cast string to boolean");
         }
 
+        /// <summary>
+        /// Insert the given <paramref name="lineSeparator"/> at intervals such that no words are broken, but there
+        /// are no more than <paramref name="width"/> characters per line. Returns a new string.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="width"></param>
+        /// <param name="lineSeparator"></param>
+        /// <param name="wordSeparator"></param>
+        /// <returns></returns>
         public static string AutoWordWrap(this string s, int width, string lineSeparator = "\r\n", 
               string wordSeparator = " ")
         {
@@ -230,6 +229,10 @@ namespace MonolithicExtensions.Portable
         }
     }
 
+    /// <summary>
+    /// Extension functions applied to a range of types with the sole intent of producing data (usually strings) more easily
+    /// read by humans.
+    /// </summary>
     public static class HumanReadableExtensions
     {
         public enum ByteUnit
@@ -335,13 +338,19 @@ namespace MonolithicExtensions.Portable
             }
         }
 
-        public static string ToMilitaryTime(this TimeSpan time)//, bool includeColon = false)
+        /// <summary>
+        /// Convert the given TimeSpan to a military time string. The amount of time in the timespan represents the time
+        /// of day; ie 23 hours is 11 o'clock.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public static string ToMilitaryTime(this TimeSpan time)
         {
             if (time.TotalHours > 24 || time.TotalHours < 0)
                 throw new InvalidOperationException("Invalid time range!");
 
             var hours = (int)time.TotalHours;
-            var minutes = ((int)time.TotalMinutes) % 60;//60 * (time.TotalHours - hours);
+            var minutes = ((int)time.TotalMinutes) % 60;
             var seconds = ((int)time.TotalSeconds) % 60;
 
             var builder = new StringBuilder($"{hours.ToString().PadLeft(2, '0')}{minutes.ToString().PadLeft(2, '0')}");
@@ -350,7 +359,6 @@ namespace MonolithicExtensions.Portable
                 builder.Append($":{seconds.ToString().PadLeft(2, '0')}");
 
             return builder.ToString();
-                //String.Format("{0:F" + 2 + "}", time.TotalHours).Replace(".", (includeColon ? ":" : ""));
         }
     }
 

@@ -11,6 +11,9 @@ using System.Windows.Forms;
 
 namespace MonolithicExtensions.Windows
 {
+    /// <summary>
+    /// A log4net appender which dumps messages to a textbox with the given name
+    /// </summary>
     public class TextBoxAppender : AppenderSkeleton
     {
         public string TextBoxName { get; set; } = "";
@@ -35,12 +38,10 @@ namespace MonolithicExtensions.Windows
                 if (string.IsNullOrWhiteSpace(textbox.Text))
                 {
                     textbox.SafeAppend(string.Join("", Backlog));
-                    //textbox.BeginInvoke(Sub() textbox.AppendText(String.Join("", Backlog)))
                 }
                 else
                 {
                     textbox.SafeAppend(Backlog.Last());
-                    //textbox.BeginInvoke(Sub() textbox.AppendText(Backlog.Last()))
                 }
             }
         }
@@ -53,7 +54,6 @@ namespace MonolithicExtensions.Windows
 
     public class Log4NetTextWriter : TextWriter
     {
-
         private string BufferedMessage { get; set; } = "";
         private log4net.ILog Logger { get; }
         public log4net.Core.Level DesiredLogLevel { get; set; } = Level.Info;

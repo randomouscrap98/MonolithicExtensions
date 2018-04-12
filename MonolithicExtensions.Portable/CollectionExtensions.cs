@@ -7,6 +7,9 @@ using System.Runtime.CompilerServices;
 
 namespace MonolithicExtensions.Portable
 {
+    /// <summary>
+    /// Extension functions applied to collections such as Lists, Dictionaries, and IEnumerables
+    /// </summary>
     public static class CollectionExtensions
     {
         private static readonly Random BaseRandom = new Random(); 
@@ -49,7 +52,7 @@ namespace MonolithicExtensions.Portable
         }
 
         /// <summary>
-        /// Merge given dictionary with self in-place. Only new entries are copied over; set replaceExisting to true 
+        /// Merge given dictionary with self in-place. Only new entries are copied over; set <paramref name="replaceExisting"/> to true 
         /// if you want to replace entries.
         /// </summary>
         /// <typeparam name="K"></typeparam>
