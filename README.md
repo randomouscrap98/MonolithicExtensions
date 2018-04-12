@@ -77,3 +77,16 @@ what anything does.
  RPC system is being used in the IDNUpdate service, so it might be worth it to
  get familiar with it (or replace it with WCF).
 
+## Setup
+
+MonolithicExtensions shouldn't have any external project/file references (they
+should all be included in the solution), however if you want all the unit tests
+to pass, you will need to install the TestService contained in this project.
+Simply run the "installService.bat" script in the 
+MonolithicExtensions.TestService/bin/debug directory to install the service
+(assuming it still works) and you should be good. It doesn't do anything fancy,
+so if the script doesn't work, you can install the service manually.
+
+Many of the unit tests require various files stored in the unit test project
+directory. These files may seem like garbage (and may be ignored in some .gitignore
+configurations), but they are definitely needed for the unit tests to pass.
