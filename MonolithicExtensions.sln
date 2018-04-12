@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonolithicExtensions.Portable", "MonolithicExtensions.Portable\MonolithicExtensions.Portable.csproj", "{35A3FD71-3A59-467A-A1A0-60EF125A4A99}"
 EndProject
@@ -16,6 +16,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonolithicExtensions.Android", "MonolithicExtensions.Android\MonolithicExtensions.Android.csproj", "{3CB4A691-A91E-4954-A9AE-E77185FC371E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionsAndroidManualTest", "ExtensionsAndroidManualTest\ExtensionsAndroidManualTest.csproj", "{8FE5191C-8E30-4CD6-81C1-769BCC85C1D3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{33BBDABD-57F8-45A3-9843-03ECB2F17C2B}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,5 +61,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BAA2278C-514B-4B58-A10E-2A2978B3844D}
 	EndGlobalSection
 EndGlobal

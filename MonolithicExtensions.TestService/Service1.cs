@@ -24,8 +24,14 @@ namespace MonolithicExtensions.TestService
         public Service1()
         {
             InitializeComponent();
+
+            //The logger initialization only needs to be performed ONCE during runtime, so put it at the beginning of an executable or something. You
+            //don't need to perform this per-class
             Log4NetExtensions.SetupDebugLogger("TestService");
             Log4NetExtensions.SetLog4NetAsDefaultLogger();
+
+            //THIS needs to be performed per-class in order to get a logger that acts as a proxy to the default logger you setup earlier. Updating the default
+            //logger will automatically update all proxy loggers, so don't worry about the order.
             Logger = LogServices.CreateLoggerFromDefault(this.GetType());
         }
 
