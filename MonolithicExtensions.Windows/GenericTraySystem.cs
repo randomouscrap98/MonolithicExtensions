@@ -18,7 +18,7 @@ namespace MonolithicExtensions.Windows
         protected ILogger Logger;
 
         public Func<object, Form> TrayFormCreator = null;
-        public Action<Form> TrayFormCleanup = null;
+        public Action<Form, object> TrayFormCleanup = null;
         public object StateObject = null;
 
         public GenericTrayItem()
@@ -74,7 +74,7 @@ namespace MonolithicExtensions.Windows
                     {
                         displayedForm = TrayFormCreator(StateObject);
                         displayedForm.ShowDialog(); //It SHOULD get stuck here! That way, it can't release the lock until the form gets closed!
-                        TrayFormCleanup?.Invoke(displayedForm);
+                        TrayFormCleanup?.Invoke(displayedForm, StateObject);
                     }
                     finally
                     {
